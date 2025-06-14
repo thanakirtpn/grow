@@ -66,21 +66,23 @@ function Knowlwdge() {
     },
   ];
 
-const getVisibleDotIndex = () => {
-    if (!carouselRef.current) return 0;
-    const scrollLeft = carouselRef.current.scrollLeft;
-    const cardWidth = carouselRef.current.children[0]?.offsetWidth || 270;
-    return Math.round(scrollLeft / (cardWidth + 8));
-  };
-
   const scrollToCategory = (index) => {
     if (carouselRef.current) {
-      const cardWidth = carouselRef.current.children[0]?.offsetWidth || 270;
-      const scrollPosition = index * (cardWidth + 8);
+      const cardWidth = carouselRef.current.children[0]?.offsetWidth || 200;
+      const scrollPosition = index * (cardWidth + 16);
       carouselRef.current.scrollTo({ left: scrollPosition, behavior: 'smooth' });
       setCurrentIndex(index);
     }
   };
+
+  // Auto-scroll ทุก 3 วินาที
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % categories.length;
+      scrollToCategory(nextIndex);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [currentIndex, categories.length]);
 
   // การจัดการการลากด้วยเมาส์
   const handleMouseDown = (e) => {
@@ -102,7 +104,6 @@ const getVisibleDotIndex = () => {
   const handleMouseUp = () => {
     if (isDragging.current) {
       isDragging.current = false;
-      setCurrentIndex(getVisibleDotIndex());
     }
   };
 
@@ -121,13 +122,8 @@ const getVisibleDotIndex = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setCurrentIndex(getVisibleDotIndex());
-    };
-
     const carousel = carouselRef.current;
     if (carousel) {
-      carousel.addEventListener('scroll', handleScroll, { passive: true });
       carousel.addEventListener('mousedown', handleMouseDown);
       carousel.addEventListener('mousemove', handleMouseMove);
       carousel.addEventListener('mouseup', handleMouseUp);
@@ -138,7 +134,6 @@ const getVisibleDotIndex = () => {
 
     return () => {
       if (carousel) {
-        carousel.removeEventListener('scroll', handleScroll);
         carousel.removeEventListener('mousedown', handleMouseDown);
         carousel.removeEventListener('mousemove', handleMouseMove);
         carousel.removeEventListener('mouseup', handleMouseUp);
@@ -152,10 +147,10 @@ const getVisibleDotIndex = () => {
   useEffect(() => {
     const handleResize = () => {
       if (carouselRef.current) {
-        const cardWidth = carouselRef.current.children[0]?.offsetWidth || 270;
+        const cardWidth = carouselRef.current.children[0]?.offsetWidth || 200;
         const maxIndex = Math.max(
           0,
-          Math.floor((carouselRef.current.scrollWidth - cardWidth) / (cardWidth + 8))
+          Math.floor((carouselRef.current.scrollWidth - cardWidth) / (cardWidth + 16))
         );
         if (currentIndex > maxIndex) {
           setCurrentIndex(maxIndex);
@@ -168,49 +163,32 @@ const getVisibleDotIndex = () => {
   }, [currentIndex]);
 
   return (
-    <div className='bg-rose-50 min-h-screen flex flex-col items-center justify-center py-20 overflow-x-hidden'>
-      <div className='container mx-auto text-center text-black py-5'>
-        <h1 className='text-4xl md:text-4xl lg:text-4xl font-semibold poppins-font text-center'>
+    <div className='bg-rose-50 min-h-screen flex flex-col items-center justify-center py-12 sm:py-16 overflow-x-hidden'>
+      <div className='container mx-auto px-4 text-center text-black py-4 sm:py-5'>
+        <h1 className='text-2xl sm:text-3xl md:text-4xl font-semibold poppins-font text-center'>
           <span className='text-[#333333]'>What</span>
-          <span className='text-[#FF5841] ml-2'>Knowledge</span>
-          <span className='text-[#333333] ml-2'>Are You Curious About?</span>
+          <span className='text-[#FF5841] ml-1 sm:ml-2'>Knowledge</span>
+          <span className='text-[#333333] ml-1 sm:ml-2'>Are You Curious About?</span>
         </h1>
-        <h2 className='text-[#333333] text-xl md:text-xl lg:text-xl mt-4 leading-loose text-center font-medium'>
-          From languages to cooking, explore posts in 10 diverse categories to share and<br />discover new knowledge.
+        <h2 className='text-[#333333] text-base sm:text-lg md:text-xl mt-2 sm:mt-4 leading-relaxed text-center font-medium'>
+          From languages to cooking, explore posts in 10 diverse categories to share and<br className='hidden sm:inline' />discover new knowledge.
         </h2>
       </div>
-      <div className='relative w-full max-w-4xl mx-auto'>
-        <div
-          ref={carouselRef}
-          className='flex overflow-x-hidden snap-x snap-mandatory space-x-20 p-4 scrollbar-hidden touch-auto'
-          style={{ scrollBehavior: 'smooth', userSelect: 'none' }}
-        >
-          {categories.map((category, index) => (
-            <div
-              key={index}
-              className='min-w-[210px] bg-white rounded-2xl shadow-md flex-shrink-0 p-0 snap-center border border-black-500'
+      <div className='relative w-full max-w-[90%] sm:max-w-3xl md:max-w-4xl mx-auto'>
+        <div ref={carouselRef} className='flex overflow-x-hidden snap-x snap-mandatory space-x-4 p-2 sm:p-4 scrollbar-hidden touch-auto'
+          style={{ scrollBehavior: 'smooth', userSelect: 'none' }} role='region' aria-label='Category Carousel'
+        > {categories.map((category, index) => (
+            <div key={index}
+              className='min-w-[180px] sm:min-w-[200px] md:min-w-[220px] bg-white rounded-2xl shadow-md flex-shrink-0 p-0 snap-center border border-gray-200'
               style={{ touchAction: 'pan-x' }}
             >
-              <img
-                src={category.image}
-                alt={category.name}
-                className='w-full h-40 object-cover rounded-t-lg'
-                draggable={false}
+              <img src={category.image} alt={`${category.name}${category.nameII ? ` ${category.nameII}` : ''}`} className='w-full h-32 sm:h-36 md:h-40 object-cover rounded-t-lg'
+                draggable={false} aria-label={`Category: ${category.name}${category.nameII ? ` ${category.nameII}` : ''}`}
               />
-              <p className='text-center mt-5 text-[#333333] font-medium min-h-[70px] break-words leading-6 text-lg whitespace-normal'>{category.name}
-                {category.nameII && <><br />{category.nameII}</>} </p>
+              <p className='text-center mt-3 sm:mt-4 text-[#333333] font-medium min-h-[60px] sm:min-h-[70px] break-words leading-5 sm:leading-6 text-base sm:text-lg whitespace-normal'>
+                {category.name}{category.nameII && <><br />{category.nameII}</>}
+              </p>
             </div>
-          ))}
-        </div>
-        <div className='flex justify-center mt-12 space-x-2'>
-          {categories.map((_, index) => (
-            <span
-              key={index}
-              className={`w-3 h-3 rounded-full ${
-                index === currentIndex ? 'bg-red-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'
-              } cursor-pointer transition-all duration-300 ease-in-out`}
-              onClick={() => scrollToCategory(index)}
-            />
           ))}
         </div>
       </div>
@@ -227,7 +205,7 @@ const getVisibleDotIndex = () => {
         }
       `}</style>
       <div className='flex items-center justify-center my-0 mx-auto max-w-screen-xl px-10 p-12'>
-           <Link to="/Find" className="bg-[#C53678] text-white w-[300px] h-[50px] flex items-center justify-center rounded-[25px] font-medium text-lg poppins-font hover:bg-[#A12C5F] transition duration-300 ease-in-out"style={{ fontWeight: 400 }}>View All Knowlwge Categories</Link>
+           <Link to="/Find" className="bg-[#C53678] text-white w-[300px] h-[50px] flex items-center justify-center rounded-[20px] font-medium text-lg poppins-font hover:bg-[#A12C5F] transition duration-300 ease-in-out"style={{ fontWeight: 400 }}>View All Knowlwge Categories</Link>
       </div>
     </div>
   );

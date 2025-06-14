@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom';
 
 function World() {
   return (
-    <div className='bg-[#FEF4F4] p-10 space-between overflow-x-hidden pb-10 '>
-      <div className='container mx-auto px-4 max-w-screen-xl flex flex-col items-center justify-center min-h-[200px] text-center'>
+    <div className='bg-[#FEF4F4] p-6 sm:p-10 flex flex-col items-center overflow-x-hidden'>
+      <div className='container mx-auto px-4 max-w-screen-xl flex flex-col items-center justify-center min-h-[200px] text-center gap-4'>
         <h2 className='text-xl sm:text-2xl lg:text-3xl mt-4 text-[#333333] font-medium poppins-font'>Unlock a World of Knowledge</h2>
-        <h1 className='text-4xl sm:text-3xl lg:text-4xl font-semibold poppins-font text-[#333333] mt-2'>Thrive Together by Sharing Insights</h1>
+        <h1 className='text-2xl sm:text-3xl lg:text-4xl font-semibold poppins-font text-[#333333]'>Thrive Together by Sharing Insights</h1>
       </div>
       <div className='text-center py-10 mx-auto max-w-screen-xl'>
       <div className='flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-12 lg:space-x-24'>
@@ -32,7 +32,7 @@ function World() {
           </div>
         </div>
         <div className='flex items-center justify-center my-0 mx-auto max-w-screen-xl px-4'>
-           <Link to="/Find" className="bg-[#C53678] text-white w-[208px] h-[50px] flex items-center justify-center rounded-[25px] font-medium text-lg poppins-font hover:bg-[#A12C5F] transition duration-300 ease-in-out"style={{ fontWeight: 400 }}>Start Exploring</Link>
+           <Link to="/Find" className="bg-[#C53678] text-white w-[208px] h-[50px] flex items-center justify-center rounded-[20px] font-medium text-lg poppins-font hover:bg-[#A12C5F] transition duration-300 ease-in-out"style={{ fontWeight: 400 }}>Start Exploring</Link>
         </div>
       </div>
     </div>
