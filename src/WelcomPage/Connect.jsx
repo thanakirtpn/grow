@@ -93,12 +93,12 @@ function Connect() {
             </>
           )}
         </div>
-        <div className='absolute top-1/2 left-0 transform -translate-y-1/2 z-50'>
+        <div className='absolute top-1/2 left-15 transform -translate-y-1/2 z-50 '>
           <span onClick={prevBuddy} className='cursor-pointer p-0'>
             <img src={Left} alt="Previous" className='w-15 h-15 text-gray-500 hover:text-gray-700' />
           </span>
         </div>
-        <div className='absolute top-1/2 right-0 transform -translate-y-1/2 z-50'>
+        <div className='absolute top-1/2 right-15 transform -translate-y-1/2 z-50'>
           <span onClick={nextBuddy} className='cursor-pointer p-0'>
             <img src={Right} alt="Next" className='w-15 h-15 text-gray-500 hover:text-gray-700' />
           </span>
