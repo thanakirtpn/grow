@@ -4,6 +4,8 @@ import Pair from '../assets/Pair.png';
 import Leo from '../assets/Leo.png';
 import Thai from '../assets/Thai.png';
 import Eng from '../assets/Eng.png';
+import Right from '../assets/Right.png'
+import Left from '../assets/Left2.png'
 
 function Connect() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,11 +26,11 @@ function Connect() {
   return (
     <div className='bg-white min-h-screen flex flex-col items-center justify-center p-6 overflow-x-hidden'>
       <div className='container mx-auto text-center space-y-6'>
-        <h1 className='text-3xl md:text-3xl font-extrabold text-center'>
-          <span className='text-black'>Connect with Skill</span>
-          <span className='text-orange-500 ml-1'>Buddies</span>
+        <h1 className='text-center poppins-text font-semibold'>
+          <span className='text-[#333333] text-4xl'>Connect with Skill</span>
+          <span className='text-[#FF5841] ml-1 text-4xl'>Buddies</span>
         </h1>
-        <h2 className='text-xl md:text-2xl mt-4 leading-loose text-center'>Looking to share skills and learn? Your perfect match is just a click away.</h2>
+        <h2 className='text-xl md:text-2xl text-[#333333] mt-4 leading-loose text-center'>Looking to share skills and learn? Your perfect match is just a click away.</h2>
       </div>
       <div className='py-5 w-full max-w-6xl flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 relative'>
         <div className="relative py-10">
@@ -92,59 +94,59 @@ function Connect() {
           )}
         </div>
         <div className='absolute top-1/2 left-0 transform -translate-y-1/2 z-50'>
-          <span onClick={prevBuddy} className='text-3xl text-gray-500 hover:text-gray-700 cursor-pointer border-none bg-transparent outline-none p-0'>
-            &lt;
+          <span onClick={prevBuddy} className='cursor-pointer p-0'>
+            <img src={Left} alt="Previous" className='w-15 h-15 text-gray-500 hover:text-gray-700' />
           </span>
         </div>
         <div className='absolute top-1/2 right-0 transform -translate-y-1/2 z-50'>
-          <span onClick={nextBuddy} className='text-3xl text-gray-500 hover:text-gray-700 cursor-pointer border-none bg-transparent outline-none p-0'>
-            &gt;
+          <span onClick={nextBuddy} className='cursor-pointer p-0'>
+            <img src={Right} alt="Next" className='w-15 h-15 text-gray-500 hover:text-gray-700' />
           </span>
         </div>
       </div>
       <div className='relative py-0 container mx-auto flex items-center justify-center space-x-58'>
         {currentIndex === 0 && (
           <>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Thee</h2>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Pair</h2>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Leo</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font'>Thee</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-[-10px]'>Pair</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-[-14px]'>Leo</h2>
           </>
         )}
         {currentIndex === 1 && (
           <>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Pair</h2>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Leo</h2>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Thee</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-2'>Pair</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-2'>Leo</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-0'>Thee</h2>
           </>
         )}
         {currentIndex === 2 && (
           <>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Leo</h2>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Thee</h2>
-            <h2 className='text-xl sm:text-2xl font-extrabold text-black'>Pair</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-3'>Leo</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-[-0px]'>Thee</h2>
+            <h2 className='text-2xl sm:text-2xl font-semibold text-[#333333] poppins-font translate-x-[-10px]'>Pair</h2>
           </>
         )}
       </div>
       <div className='relative py-0 container mx-auto flex items-center justify-center space-x-26'>
         {currentIndex === 0 && (
           <>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>Draw everything from heart</p>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>The Kitchen is mine</p>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>Numbers light me up.</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-3'>Draw everything from heart</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-[-26px]'>The Kitchen is mine</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-[-44px]'>Numbers light me up.</p>
           </>
         )}
         {currentIndex === 1 && (
           <>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>The Kitchen is mine</p>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>Numbers light me up.</p>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>Draw everything from heart</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-13'>The Kitchen is mine</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-10'>Numbers light me up.</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-[-12px]'>Draw everything from heart</p>
           </>
         )}
         {currentIndex === 2 && (
           <>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>Numbers light me up.</p>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>Draw everything from heart</p>
-            <p className='text-base sm:text-lg text-black text-center max-w-xs'>The Kitchen is mine</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-11'>Numbers light me up.</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-[-12px]'>Draw everything from heart</p>
+            <p className='text-lg sm:text-lg text-[#333333] poppins-font text-center max-w-xs font-normal translate-x-[-55px]'>The Kitchen is mine</p>
           </>
         )}
       </div>

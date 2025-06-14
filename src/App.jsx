@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route , useLocation } from 'react-router-dom'; 
 import './App.css'
+import './index.css';
 
 import Navbar from './WelcomPage/Navbar'
 import Shareknow from './WelcomPage/Shareknow'
@@ -11,6 +12,7 @@ import Login from './Signin/Login';
 import JoinNow from './Signin/JoinNow';
 import Skills from './WelcomPage/Skills';
 import Find from './WelcomPage/Find'
+import Lasttab from './WelcomPage/Lasttab';
 
 
 function App() {
@@ -30,6 +32,7 @@ function App() {
               <Connect />
               <Knowlwdge />
               <Skills />
+              <Lasttab />
             </div>
           } />
           <Route path="/Login" element={<Login />} />
