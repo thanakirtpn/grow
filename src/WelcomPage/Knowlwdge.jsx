@@ -179,7 +179,7 @@ function Knowlwdge() {
           style={{ scrollBehavior: 'smooth', userSelect: 'none' }} role='region' aria-label='Category Carousel'
         > {categories.map((category, index) => (
             <div key={index}
-              className='min-w-[180px] sm:min-w-[200px] md:min-w-[220px] bg-white rounded-2xl shadow-md flex-shrink-0 p-0 snap-center border border-gray-200'
+              className='min-w-[180px] sm:min-w-[200px] md:min-w-[220px] bg-white rounded-2xl shadow-md flex-shrink-0 p-0 snap-center border border-black-10'
               style={{ touchAction: 'pan-x' }}
             >
               <img src={category.image} alt={`${category.name}${category.nameII ? ` ${category.nameII}` : ''}`} className='w-full h-32 sm:h-36 md:h-40 object-cover rounded-t-lg'
