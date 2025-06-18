@@ -38,29 +38,29 @@ function PostCard({ post }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-      <div className="relative w-full h-48 sm:h-56">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col h-full">
+      <div className="relative w-20 sm:w-40 md:w-60 h-20 sm:h-30 md:h-40 flex justify-center mt-1 sm:mt-4 mx-auto">
         <img
           src={imageUrl}
           alt={post.title || 'Post image'}
-          className="w-full h-full object-cover"
-          onError={(e) => { e.target.src = 'https://via.placeholder.com/300x200?text=Error'; console.log('Image load failed'); }} // กรณีโหลดรูปไม่สำเร็จ
+          className="w-full max-w-xs h-full object-cover rounded-lg"
+          onError={(e) => { e.target.src = 'https://via.placeholder.com/300x200?text=Error'; console.log('Image load failed'); }}
         />
       </div>
 
-      <div className="p-4 flex flex-col flex-grow">
-        <h3 className="text-sm text-gray-500 mb-1">{categoryName}</h3>
-        <h2 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{post.title}</h2>
+      <div className="p-3 flex flex-col flex-grow min-h-0 inline-block">
+        <h3 className="text-sm text-[#C53678] px-2 py-1 mb-1 bg-rose-50 rounded-xl inline-block w-auto max-w-full">{categoryName}</h3>
+        <h2 className="text-base font-semibold text-[#333333] py-2 line-clamp-2">{post.title}</h2>
         <div className="flex items-center mt-auto">
           <img
             src={profilePictureUrl}
             alt={authorName}
-            className="w-8 h-8 rounded-full object-cover mr-2"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover mr-2"
             onError={(e) => { e.target.src = 'https://via.placeholder.com/30x30?text=Error'; console.log('Profile pic load failed'); }}
           />
-          <div className="text-sm">
-            <p className="font-medium text-gray-800">{authorName}</p>
-            <p className="text-gray-500">{timeAgo(post.created_at)}</p>
+          <div className="flex text-[13px] gap-4">
+            <p className="font-medium text-[#97989F]">{authorName}</p>
+            <p className="font-normal text-[#97989F]">{timeAgo(post.created_at)}</p>
           </div>
         </div>
       </div>
