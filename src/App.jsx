@@ -11,9 +11,8 @@ import Knowlwdge from './WelcomPage/Knowlwdge'
 import Login from './Signin/Login'; 
 import JoinNow from './Signin/JoinNow';
 import Skills from './WelcomPage/Skills';
-import Find from './WelcomPage/Find'
 import Lasttab from './WelcomPage/Lasttab';
-
+import Find from './WelcomPage/Find';
 
 function App() {
   const [count, setCount] = useState(0)

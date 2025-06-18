@@ -9,7 +9,6 @@ import Handicrafts from '../assets/Handicrafts.jpg';
 import Photo from '../assets/Photography.jpg';
 import Writing from '../assets/Writing.jpg';
 import Design from '../assets/Design.jpg';
-import { Link } from 'react-router-dom';
 
 function Knowlwdge() {
   const [currentIndex, setCurrentIndex] = useState(0);
