@@ -56,9 +56,9 @@ function Find() {
         }));
 
         const allCategories = [{ id: null, name: 'All', path: '/all' }, ...apiCategories];
-        const categoriesWithIcons = allCategories.map(cat => ({
-          ...cat,
-          icon: getCategoryIcon(cat.name),
+        const categoriesWithIcons = allCategories.map(category => ({
+          ...category,
+          icon: getCategoryIcon(category.name),
         }));
         console.log('Categories with Icons:', categoriesWithIcons);
 
@@ -218,32 +218,36 @@ function Find() {
                 </button>
                 <div
                   ref={scrollRef}
-                  className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide"
-                  style={{ touchAction: 'pan-x' }} // รองรับการเลื่อนสัมผัส
+                  className="flex items-center gap-1 sm:gap-2 overflow-x-scroll scrollbar-hide" // เพิ่ม scrollbar-hide เพื่อซ่อน scrollbar
+                  style={{ touchAction: 'pan-x' }}
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
                 >
                   {categories.map((category) => (
-                    <Link
-                      key={category.name}
-                      to="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleCategoryClick(category.id);
-                      }}
-                      className={`border px-2 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-lg font-light poppins-font flex items-center gap-1 sm:gap-2 justify-center w-auto whitespace-nowrap ${
-                        selectedCategoryId === category.id
-                          ? 'bg-[#C53678] border-[#C53678] text-white'
-                          : 'bg-white border-[#C53678] text-[#C53678] hover:bg-[#C53678] hover:text-white'
-                      }`}
-                      style={{ fontWeight: 300 }}
-                    >
-                      <span className="text-base sm:text-lg" role="img" aria-label={category.name}>
-                        {category.icon || '🏷️'}
-                      </span>
-                      <span className="text-xs sm:text-sm md:text-base font-normal poppins-font">{category.name}</span>
-                    </Link>
+                    <div className="relative inline-block group">
+                      <Link
+                        key={category.name}
+                        to="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleCategoryClick(category.id);
+                        }}
+                        className={`border px-2 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-lg font-light poppins-font flex items-center gap-1 sm:gap-2 justify-center w-auto whitespace-nowrap 
+                          ${selectedCategoryId === category.id
+                            ? 'bg-[#C53678] border-[#C53678] text-white'
+                            : 'text-[#C53678] border-[#C53678] hover:bg-[#C53678] hover:text-white'
+                          }`}
+                        style={{ fontWeight: 300 }}
+                      >
+                        <span className="text-base sm:text-lg" role="img" aria-label={category.name}>
+                          {category.icon || '🏷️'}
+                        </span>
+                        <span className="text-xs sm:text-sm md:text-base font-normal poppins-font group-hover:text-white">
+                          {category.name}
+                        </span>
+                      </Link>
+                    </div>
                   ))}
                 </div>
                 <button

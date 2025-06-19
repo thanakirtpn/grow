@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
 
+
 :root {
   font-family: Poppins,Yesteryear;
   line-height: 1.5;
@@ -19,6 +20,14 @@ body {
   min-width: 380px;
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 
