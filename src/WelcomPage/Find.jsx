@@ -9,21 +9,16 @@ function Find() {
   const [isOpen, setIsOpen] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const scrollRef = useRef(null);
-
-  // State สำหรับหมวดหมู่
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [errorCategories, setErrorCategories] = useState(null);
-
-  // State สำหรับโพสต์
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [errorPosts, setErrorPosts] = useState(null);
-
-  // เก็บ categoryId ที่เลือก
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [isMomentActive, setIsMomentActive] = useState(false);
 
-  // กำหนดอิโมจิตามหมวดหมู่
   const getCategoryIcon = (categoryName) => {
     const emojis = {
       'All': '📚',
@@ -41,7 +36,6 @@ function Find() {
     return emojis[categoryName] || '🏷️';
   };
 
-  // ดึงข้อมูลหมวดหมู่
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
@@ -66,7 +60,7 @@ function Find() {
           ...cat,
           icon: getCategoryIcon(cat.name),
         }));
-        console.log('Categories with Icons:', categoriesWithIcons); // เพิ่มการตรวจสอบ
+        console.log('Categories with Icons:', categoriesWithIcons);
 
         setCategories(categoriesWithIcons);
       } catch (err) {
@@ -87,7 +81,6 @@ function Find() {
     fetchCategories();
   }, []);
 
-  // ดึงข้อมูลโพสต์ตาม categoryId
   useEffect(() => {
     const fetchPosts = async () => {
       setLoadingPosts(true);
@@ -125,12 +118,13 @@ function Find() {
   };
 
   const handleFindClick = () => {
-    setShowCategories();
+    setShowCategories(true);
     console.log('Find clicked');
   };
 
   const handleMomentClick = () => {
     setShowCategories(!showCategories);
+    setIsMomentActive(!showCategories);
     console.log('Moment clicked');
   };
 
@@ -138,6 +132,23 @@ function Find() {
 
   const scrollLeft = () => scrollRef.current?.scrollBy({ left: -150, behavior: 'smooth' });
   const scrollRight = () => scrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' });
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!scrollRef.current || touchStart === null) return;
+
+    const touchCurrent = e.touches[0].clientX;
+    const diff = touchStart - touchCurrent;
+    scrollRef.current.scrollLeft += diff;
+    setTouchStart(touchCurrent);
+  };
+
+  const handleTouchEnd = () => {
+    setTouchStart(null);
+  };
 
   return (
     <nav className="bg-white p-4 sm:p-6 md:p-8">
@@ -157,7 +168,7 @@ function Find() {
           </li>
           <li>
             <Link
-              className="w-[68px] h-[32px] px-4 py-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+              className={`w-[68px] h-[32px] px-4 py-2 rounded-lg cursor-pointer ${isMomentActive ? 'text-[#C53678]' : 'hover:bg-white-100'}`}
               onClick={handleMomentClick}
               style={{ fontWeight: 300 }}
             >
@@ -191,21 +202,28 @@ function Find() {
         </div>
       </div>
       {showCategories && (
-        <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg mx-4 sm:mx-6 md:mx-8">
+        <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg mx-auto max-w-screen-lg">
           {loadingCategories && <p className="text-center text-gray-700">Loading categories...</p>}
           {errorCategories && <p className="text-center text-red-500">Error: {errorCategories}</p>}
           {!loadingCategories && !errorCategories && categories.length > 0 && (
             <div className="container mx-auto">
-              <p className="text-[#333333] font-semibold text-lg sm:text-xl md:text-2xl poppins-font p-2 sm:p-4">Latest Post</p>
-              <div className="flex items-center justify-center gap-2 sm:gap-4 mt-2 sm:mt-4">
+              <p className="text-[#333333] font-semibold text-lg sm:text-xl md:text-2xl poppins-font p-2 sm:p-4 mb-0 sm:mb-0 text-left">Latest Post</p>
+              <div className="flex items-center justify-center gap-0 sm:gap-1 mt-0 sm:mt-0">
                 <button
                   onClick={scrollLeft}
-                  className="bg-white p-2 sm:p-3 rounded-full hover:bg-gray-100"
+                  className="p-2 sm:p-3 rounded-full"
                   aria-label="Scroll left"
                 >
-                  <img src={myImageL} alt="Scroll Left" className="w-20 sm:w-25 h-5 sm:h-10" />
+                  <img src={myImageL} alt="Scroll Left" className="w-20 sm:w-36 h-5 sm:h-12" />
                 </button>
-                <div ref={scrollRef} className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide flex-grow">
+                <div
+                  ref={scrollRef}
+                  className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide"
+                  style={{ touchAction: 'pan-x' }} // รองรับการเลื่อนสัมผัส
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
                   {categories.map((category) => (
                     <Link
                       key={category.name}
@@ -222,25 +240,25 @@ function Find() {
                       style={{ fontWeight: 300 }}
                     >
                       <span className="text-base sm:text-lg" role="img" aria-label={category.name}>
-                        {category.icon || '🏷️'} {/* ใช้ fallback หาก icon ไม่มี */}
+                        {category.icon || '🏷️'}
                       </span>
-                      <span className="text-xs sm:text-sm md:text-base font-medium poppins-font">{category.name}</span>
+                      <span className="text-xs sm:text-sm md:text-base font-normal poppins-font">{category.name}</span>
                     </Link>
                   ))}
                 </div>
                 <button
                   onClick={scrollRight}
-                  className="bg-white p-2 sm:p-3 rounded-full hover:bg-gray-100"
+                  className="p-2 sm:p-3 rounded-full hover:bg-gray-100"
                   aria-label="Scroll right"
                 >
-                  <img src={myImageR} alt="Scroll Right" className="w-20 sm:w-25 h-5 sm:h-10" />
+                  <img src={myImageR} alt="Scroll Right" className="w-20 sm:w-36 h-5 sm:h-12" />
                 </button>
               </div>
-              <section className="container mx-auto p-2 sm:p-4 md:p-6 mt-4 sm:mt-6">
+              <section className="container mx-auto p-1 sm:p-2 md:p-4 mt-0 sm:mt-0">
                 {loadingPosts && <p className="text-center text-gray-700">Loading posts...</p>}
                 {errorPosts && <p className="text-center text-red-500">Error fetching posts: {errorPosts}</p>}
                 {!loadingPosts && !errorPosts && posts.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
                     {posts.map((post) => (
                       <PostCard key={post.id} post={post} />
                     ))}

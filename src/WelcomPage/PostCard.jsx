@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function PostCard({ post }) {
   if (!post) {
     return null;
   }
 
-  const imageUrl = post.images && post.images.length > 0 && post.images[0].image_url
+  const [imageError, setImageError] = useState(false);
+  const [profileError, setProfileError] = useState(false);
+
+  const imageUrl = !imageError && post.images && post.images.length > 0 && post.images[0].image_url
     ? `https://cf07-223-24-156-219.ngrok-free.app${post.images[0].image_url}`
-    : 'https://via.placeholder.com/300x200?text=No+Image';
+    : '../assets/Language.jpg';
   console.log('Image URL:', imageUrl);
 
-  const profilePictureUrl = post.user && post.user.profile_picture
+  const profilePictureUrl = !profileError && post.user && post.user.profile_picture
     ? `https://cf07-223-24-156-219.ngrok-free.app${post.user.profile_picture}`
-    : 'https://via.placeholder.com/30x30?text=NP';
+    : '../assets/Writing.jpg';
   console.log('Profile Picture URL:', profilePictureUrl);
 
   const categoryName = post.category ? post.category.name : 'Uncategorized';
@@ -38,27 +41,39 @@ function PostCard({ post }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col h-full">
-      <div className="relative w-20 sm:w-40 md:w-60 h-20 sm:h-30 md:h-40 flex justify-center mt-1 sm:mt-4 mx-auto">
+    <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden flex flex-col h-full">
+      <div className="relative w-full sm:w-5/6 md:w-6/7 h-32 sm:h-34 md:h-36 flex justify-center mt-3 sm:mt-5 mx-auto">
         <img
           src={imageUrl}
           alt={post.title || 'Post image'}
-          className="w-full max-w-xs h-full object-cover rounded-lg"
-          onError={(e) => { e.target.src = 'https://via.placeholder.com/300x200?text=Error'; console.log('Image load failed'); }}
+          className="w-full h-full object-cover rounded-lg"
+          onError={(e) => {
+            setImageError(true);
+            e.target.src = '../assets/Language.jpg';
+            console.log('Image load failed');
+          }}
         />
       </div>
 
-      <div className="p-3 flex flex-col flex-grow min-h-0 inline-block">
-        <h3 className="text-sm text-[#C53678] px-2 py-1 mb-1 bg-rose-50 rounded-xl inline-block w-auto max-w-full">{categoryName}</h3>
-        <h2 className="text-base font-semibold text-[#333333] py-2 line-clamp-2">{post.title}</h2>
-        <div className="flex items-center mt-auto">
+      <div className="p-2 sm:p-3 flex flex-col flex-grow min-h-0">
+        <h3 className="text-sm sm:text-base text-[#C53678] px-2 py-1 mb-1 bg-rose-50 rounded-xl inline-block w-auto max-w-full">
+          {categoryName}
+        </h3>
+        <h2 className="text-base sm:text-lg font-semibold text-[#333333] py-1 sm:py-2 line-clamp-2">
+          {post.title}
+        </h2>
+        <div className="flex items-center mt-0">
           <img
             src={profilePictureUrl}
             alt={authorName}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover mr-2"
-            onError={(e) => { e.target.src = 'https://via.placeholder.com/30x30?text=Error'; console.log('Profile pic load failed'); }}
+            className="w-6 sm:w-8 h-6 sm:h-8 rounded-full object-cover mr-2"
+            onError={(e) => {
+              setProfileError(true);
+              e.target.src = '../assets/Writing.jpg';
+              console.log('Profile pic load failed');
+            }}
           />
-          <div className="flex text-[13px] gap-4">
+          <div className="flex text-[13px] sm:text-sm gap-2 sm:gap-4">
             <p className="font-medium text-[#97989F]">{authorName}</p>
             <p className="font-normal text-[#97989F]">{timeAgo(post.created_at)}</p>
           </div>
