@@ -233,17 +233,17 @@ function Find() {
                           e.preventDefault();
                           handleCategoryClick(category.id);
                         }}
-                        className={`border px-2 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-sm md:text-sm font-medium poppins-font flex items-center gap-1 sm:gap-2 justify-center w-auto whitespace-nowrap 
+                        className={`border px-2 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-sm md:text-sm font-light poppins-font flex items-center gap-1 sm:gap-2 justify-center w-auto whitespace-nowrap 
                           ${selectedCategoryId === category.id
                             ? 'bg-[#C53678] border-[#C53678] text-white'
                             : 'text-[#C53678] border-[#C53678] hover:bg-[#C53678] hover:text-white'
                           }`}
                         style={{ fontWeight: 300 }}
                       >
-                        <span className="text-base sm:text-lg" role="img" aria-label={category.name}>
+                        <span className="text-sm sm:text-sm font-medium" role="img" aria-label={category.name}>
                           {category.icon || '🏷️'}
                         </span>
-                        <span className="text-xs sm:text-sm md:text-base font-normal poppins-font group-hover:text-white">
+                        <span className="text-sm sm:text-sm md:text-sm font-medium poppins-font group-hover:text-white">
                           {category.name}
                         </span>
                       </Link>
