@@ -55,7 +55,7 @@ function PostCard({ post }) {
         />
       </div>
 
-      <div className="p-2 sm:p-3 flex flex-col flex-grow min-h-0">
+      <div className="p-2 sm:p-3 flex flex-col flex-grow min-h-0 inline-block">
         <h3 className="text-sm sm:text-base text-[#C53678] px-2 py-1 mb-1 bg-rose-50 rounded-xl inline-block w-auto max-w-full">
           {categoryName}
         </h3>
