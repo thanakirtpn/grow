@@ -156,7 +156,7 @@ function Find() {
         <Link to="/" className="flex items-center text-black font-bold text-3xl sm:text-4xl md:text-5xl hover:text-gray-900" aria-label="Go to homepage">
           <img src={myImageG} alt="GlowTogether Logo" className="h-5 sm:h-10 md:h-12 object-contain" />
         </Link>
-        <ul className="hidden sm:flex text-[#333333] text-base sm:text-lg md:text-xl px-4 py-2 rounded-lg font-light poppins-font gap-6">
+        <ul className="hidden sm:flex text-[#333333] text-base sm:text-base md:text-base px-4 py-2 rounded-lg font-normal poppins-font gap-6">
           <li>
             <Link
               className="w-[68px] h-[32px] px-4 py-2 rounded-lg hover:bg-gray-100 cursor-pointer"
@@ -233,7 +233,7 @@ function Find() {
                           e.preventDefault();
                           handleCategoryClick(category.id);
                         }}
-                        className={`border px-2 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-lg font-light poppins-font flex items-center gap-1 sm:gap-2 justify-center w-auto whitespace-nowrap 
+                        className={`border px-2 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-sm md:text-sm font-medium poppins-font flex items-center gap-1 sm:gap-2 justify-center w-auto whitespace-nowrap 
                           ${selectedCategoryId === category.id
                             ? 'bg-[#C53678] border-[#C53678] text-white'
                             : 'text-[#C53678] border-[#C53678] hover:bg-[#C53678] hover:text-white'

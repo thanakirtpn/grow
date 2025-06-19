@@ -8,16 +8,14 @@ function PostCard({ post }) {
   const [imageError, setImageError] = useState(false);
   const [profileError, setProfileError] = useState(false);
 
-  // กำหนด imageUrl โดยใช้ fallback ถ้ามี error
   const imageUrl = !imageError && post.images && post.images.length > 0 && post.images[0].image_url
     ? `https://cf07-223-24-156-219.ngrok-free.app${post.images[0].image_url}`
-    : '../assets/Language.jpg';
+    : '';
   console.log('Image URL:', imageUrl);
 
-  // กำหนด profilePictureUrl โดยใช้ fallback ถ้ามี error
   const profilePictureUrl = !profileError && post.user && post.user.profile_picture
     ? `https://cf07-223-24-156-219.ngrok-free.app${post.user.profile_picture}`
-    : '../assets/Writing.jpg';
+    : '';
   console.log('Profile Picture URL:', profilePictureUrl);
 
   const categoryName = post.category ? post.category.name : 'Uncategorized';
@@ -72,7 +70,7 @@ function PostCard({ post }) {
             alt={authorName}
             className="w-6 sm:w-8 h-6 sm:h-8 rounded-full object-cover mr-2"
             onError={(e) => {
-              if (!profileError) { // จำกัดการตั้งค่า error เพียงครั้งเดียว
+              if (!profileError) {
                 setProfileError(true);
                 e.target.src = '../assets/Writing.jpg';
                 console.log('Profile pic load failed');
