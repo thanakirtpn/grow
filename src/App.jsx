@@ -13,6 +13,8 @@ import JoinNow from './Signin/JoinNow';
 import Skills from './WelcomPage/Skills';
 import Lasttab from './WelcomPage/Lasttab';
 import Find from './WelcomPage/Find';
+import TabBarRegister from './Register/TabBarRegister';
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -37,6 +39,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path='/JoinNow' element={<JoinNow />} />
           <Route path='/Find' element={<Find />} />
+          <Route path='/TabBarRegister' element={<TabBarRegister />} />
         </Routes>
       </div>
     </Router>

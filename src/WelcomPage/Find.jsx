@@ -41,7 +41,7 @@ function Find() {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
-        const response = await fetch('https://cf07-223-24-156-219.ngrok-free.app/moment/categories', {
+        const response = await fetch('https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app/moment/categories', {
           headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -86,7 +86,7 @@ function Find() {
       setLoadingPosts(true);
       setErrorPosts(null);
       try {
-        let url = 'https://cf07-223-24-156-219.ngrok-free.app/moment';
+        let url = 'https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app/moment';
         if (selectedCategoryId !== null) {
           url += `?categoryId=${selectedCategoryId}`;
         }
@@ -208,17 +208,17 @@ function Find() {
           {!loadingCategories && !errorCategories && categories.length > 0 && (
             <div className="container mx-auto">
               <p className="text-[#333333] font-semibold text-lg sm:text-xl md:text-2xl poppins-font p-2 sm:p-4 mb-0 sm:mb-0 text-left">Latest Post</p>
-              <div className="flex items-center justify-center gap-0 sm:gap-1 mt-0 sm:mt-0">
+              <div className="flex items-center justify-center gap-0 sm:gap-1 mt-0 sm:mt-0 ">
                 <button
                   onClick={scrollLeft}
-                  className="p-2 sm:p-3 rounded-full"
+                  className="p-2 sm:p-3 rounded-full border-none bg-transparent outline-none no-style hover:underline"
                   aria-label="Scroll left"
                 >
-                  <img src={myImageL} alt="Scroll Left" className="w-20 sm:w-36 h-5 sm:h-12" />
+                  <img src={myImageL} alt="Scroll Left" className="w-20 sm:w-36 h-5 sm:h-12 " />
                 </button>
                 <div
                   ref={scrollRef}
-                  className="flex items-center gap-1 sm:gap-2 overflow-x-scroll scrollbar-hide" // เพิ่ม scrollbar-hide เพื่อซ่อน scrollbar
+                  className="flex items-center gap-1 sm:gap-2 overflow-x-scroll scrollbar-hide"
                   style={{ touchAction: 'pan-x' }}
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
@@ -252,7 +252,7 @@ function Find() {
                 </div>
                 <button
                   onClick={scrollRight}
-                  className="p-2 sm:p-3 rounded-full hover:bg-gray-100"
+                  className="p-2 sm:p-3 rounded-full hover:bg-gray-100 border-none bg-transparent outline-none no-style hover:underline"
                   aria-label="Scroll right"
                 >
                   <img src={myImageR} alt="Scroll Right" className="w-20 sm:w-36 h-5 sm:h-12" />

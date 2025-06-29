@@ -9,12 +9,12 @@ function PostCard({ post }) {
   const [profileError, setProfileError] = useState(false);
 
   const imageUrl = !imageError && post.images && post.images.length > 0 && post.images[0].image_url
-    ? `https://cf07-223-24-156-219.ngrok-free.app${post.images[0].image_url}`
+    ? `https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app${post.images[0].image_url}`
     : '';
   console.log('Image URL:', imageUrl);
 
   const profilePictureUrl = !profileError && post.user && post.user.profile_picture
-    ? `https://cf07-223-24-156-219.ngrok-free.app${post.user.profile_picture}`
+    ? `https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app${post.user.profile_picture}`
     : '';
   console.log('Profile Picture URL:', profilePictureUrl);
 
@@ -48,7 +48,7 @@ function PostCard({ post }) {
           alt={post.title || 'Post image'}
           className="w-full h-full object-cover rounded-lg"
           onError={(e) => {
-            if (!imageError) { // จำกัดการตั้งค่า error เพียงครั้งเดียว
+            if (!imageError) {
               setImageError(true);
               e.target.src = '../assets/Language.jpg';
               console.log('Image load failed');

@@ -38,7 +38,9 @@ body {
   a:hover {
     color: #C53678;
   }
-  button {
-    background-color: #ffffff;
+  button:not(.no-style) {
+    background-color: #C53678;
+    color: #FFFFFF;
+    border: none;
   }
 }
