@@ -375,7 +375,11 @@ const TabBarRegister = () => {
   };
 
   return (
-    <div className="bg-white">
+    <div
+      className={`bg-white relative min-h-screen ${
+        step === 3 ? 'Register-container no-curve' : 'Register-container'
+      }`}
+    >
       <nav className="bg-white p-4 sm:p-6 md:p-8">
         <div className="container mx-auto flex justify-between items-center">
           <Link
@@ -613,7 +617,7 @@ const TabBarRegister = () => {
           </div>
         )}
         {step === 3 && (
-          <div className="container mx-auto flex justify-center items-center p-1 flex-col translate-y-1">
+          <div className="container mx-auto flex justify-center items-center p-1 flex-col translate-y-1 no-curve">
             <div className="container mx-auto flex justify-center items-center p-7 flex-col translate-y-1 pr-18">
               <div className="text-[#333333] poppins-font">
                 <p className="text-[32px] font-semibold">Your Profile</p>
