@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import myImageG from '../assets/GlowTogather logo.png';
-import { Link } from 'react-router-dom';
 import myImageL from '../assets/Login.jpg';
 
 function Login() {
@@ -9,6 +9,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,7 +17,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app/auth/login/', {
+      const response = await fetch('https://4010-49-237-38-131.ngrok-free.app/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -26,10 +27,11 @@ function Login() {
         throw new Error(data.message || 'Login failed');
       }
       console.log('Login successful, Token:', data.token);
-      localStorage.setItem('token', data.token); // Store token
+      localStorage.setItem('authToken', data.token);
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
       }
+      navigate('/Homepost');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -42,11 +44,19 @@ function Login() {
       <nav className="p-4 sm:p-6 md:p-8">
         <div className="container mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center text-black font-bold text-3xl sm:text-4xl md:text-5xl hover:text-gray-900">
-            <img src={myImageG} alt="MeG" className="h-5 sm:h-10 md:h-12 object-contain" />
+            <img src={myImageG} alt="GlowTogather Logo" className="h-5 sm:h-10 md:h-12 object-contain" />
           </Link>
           <div className="flex items-center space-x-8 poppins-font">
-            <Link to="/" className="text-[#333537] font-normal text-lg hover:text-[#C53678]" style={{ fontWeight: 300 }}>Home</Link>
-            <Link to="/TabBarRegister" className="text-[#333537] hover:text-[#C53678] font-normal text-lg px-10 py-2 flex rounded-full" style={{ fontWeight: 300 }}>Sign up</Link>
+            <Link to="/" className="text-[#333537] font-normal text-lg hover:text-[#C53678]" style={{ fontWeight: 300 }}>
+              Home
+            </Link>
+            <Link
+              to="/JoinNow"
+              className="text-[#333537] hover:text-[#C53678] font-normal text-lg px-10 py-2 flex rounded-full"
+              style={{ fontWeight: 300 }}
+            >
+              Sign up
+            </Link>
           </div>
         </div>
       </nav>
@@ -57,8 +67,8 @@ function Login() {
             <p className="text-[32px] font-semibold pl-1">Nice to Meet You Again</p>
             <p className="text-base font-normal">Let’s Continue Sharing and Learning Together Every Day!</p>
             <form onSubmit={handleLogin} className="mt-8">
-              <div className=''>
-                <p className='text-base font-medium'>Please enter your email</p>
+              <div>
+                <p className="text-base font-medium">Please enter your email</p>
                 <input
                   type="email"
                   placeholder="Email"
@@ -68,7 +78,7 @@ function Login() {
                 />
               </div>
               <div>
-                <p className='text-base font-medium'>Please enter your Password</p>
+                <p className="text-base font-medium">Please enter your Password</p>
                 <input
                   type="password"
                   placeholder="Password"
@@ -85,12 +95,16 @@ function Login() {
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="h-4 w-4 text-[#C53678] focus:ring-[#C53678] border-[#7E7E7E] rounded"
                     />
-                    <label htmlFor="rememberMe" className="ml-2 text-sm text-[#333537] font-normal">Remember Me</label>
+                    <label htmlFor="rememberMe" className="ml-2 text-sm text-[#333537] font-normal">
+                      Remember Me
+                    </label>
                   </div>
-                  <Link to="/forgot-password" className="text-sm text-[#FF6250] font-normal underline ">Forget your password?</Link>
+                  <Link to="/forgot-password" className="text-sm text-[#FF6250] font-normal underline">
+                    Forget your password?
+                  </Link>
                 </div>
               </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               <button
                 type="submit"
                 disabled={loading}

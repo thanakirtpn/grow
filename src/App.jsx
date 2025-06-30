@@ -13,7 +13,7 @@ import JoinNow from './Signin/JoinNow';
 import Skills from './WelcomPage/Skills';
 import Lasttab from './WelcomPage/Lasttab';
 import Find from './WelcomPage/Find';
-import TabBarRegister from './Register/TabBarRegister';
+import Homepost from './Signin/Homepost';
 
 
 function App() {
@@ -39,7 +39,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path='/JoinNow' element={<JoinNow />} />
           <Route path='/Find' element={<Find />} />
-          <Route path='/TabBarRegister' element={<TabBarRegister />} />
+          <Route path='/Homepost' element={<Homepost />} />
         </Routes>
       </div>
     </Router>
