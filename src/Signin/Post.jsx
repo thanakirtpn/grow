@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import defaultImage from '../assets/Language.jpg';
 import defaultProfile from '../assets/Writing.jpg';
 
-function PostCard({ post }) {
+function Post({ post }) {
   if (!post) return null;
 
   const [imageError, setImageError] = useState(false);
@@ -118,4 +118,4 @@ function PostCard({ post }) {
   );
 }
 
-export default PostCard;
+export default Post;

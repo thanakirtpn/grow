@@ -48,7 +48,7 @@ const JoinNow = () => {
   const [categories, setCategories] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const dateInputRef = useRef(null);
-  const navigate = useNavigate(); // Added for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedEmail = localStorage.getItem('registerEmail');
@@ -63,7 +63,7 @@ const JoinNow = () => {
         setIsLoadingCategories(true);
         try {
           const response = await fetch(
-            'https://4010-49-237-38-131.ngrok-free.app/moment/categories',
+            'https://35420d9f0ddb.ngrok-free.app/moment/categories',
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
@@ -108,7 +108,7 @@ const JoinNow = () => {
         throw new Error('Please enter a valid email');
       }
       const response = await fetch(
-        'https://4010-49-237-38-131.ngrok-free.app/auth/register-step1',
+        'https://35420d9f0ddb.ngrok-free.app/auth/register-step1',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -144,7 +144,7 @@ const JoinNow = () => {
     const storedEmail = localStorage.getItem('registerEmail') || email;
     try {
       const response = await fetch(
-        'https://4010-49-237-38-131.ngrok-free.app/auth/register-step2',
+        'https://35420d9f0ddb.ngrok-free.app/auth/register-step2',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -188,7 +188,7 @@ const JoinNow = () => {
       console.log('Sending data:', { email: storedEmail, username, aboutMe, dateOfBirth });
 
       const response = await fetch(
-        'https://4010-49-237-38-131.ngrok-free.app/auth/register-step3',
+        'https://35420d9f0ddb.ngrok-free.app/auth/register-step3',
         {
           method: 'POST',
           body: formData,
@@ -227,7 +227,7 @@ const JoinNow = () => {
         throw new Error('Invalid email in storage');
       }
       const response = await fetch(
-        'https://4010-49-237-38-131.ngrok-free.app/auth/resend-otp',
+        'https://35420d9f0ddb.ngrok-free.app/auth/resend-otp',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -263,7 +263,7 @@ const JoinNow = () => {
     try {
       console.log('Sending interests:', interestsToSend);
       const response = await fetch(
-        'https://4010-49-237-38-131.ngrok-free.app/auth/register-step4',
+        'https://35420d9f0ddb.ngrok-free.app/auth/register-step4',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -278,7 +278,7 @@ const JoinNow = () => {
       localStorage.setItem('authToken', token);
       console.log('Registration completed, Token stored:', token);
       localStorage.removeItem('registerEmail');
-      navigate('/Homepost'); // Redirect to Homepost
+      navigate('/Homepost');
     } catch (error) {
       console.error('Error in completeRegistration:', error);
       setErrors({ ...errors, personal: error.message || 'Failed to complete registration.' });
@@ -364,7 +364,7 @@ const JoinNow = () => {
       });
     } else if (step === 4) {
       setInterests([]);
-      completeRegistration([]); // Send empty interests for Skip
+      completeRegistration([]);
     }
   };
 

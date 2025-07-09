@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import myImageG from '../assets/GlowTogather logo.png';
 import myImageL from '../assets/Left2.png';
 import myImageR from '../assets/Right.png';
-import PostCard from './Postcard';
+import PostCard from './PostCard';
 
 function Find() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,12 +41,11 @@ function Find() {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
-        const response = await fetch('https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app/moment/categories', {
+        const response = await fetch('https://35420d9f0ddb.ngrok-free.app/moment/categories', {
           headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const text = await response.text();
-        const data = JSON.parse(text);
+        const data = await response.json();
         console.log('Categories API Response:', data);
 
         const apiCategories = data.map(category => ({
@@ -55,7 +54,7 @@ function Find() {
           path: `/${category.name.toLowerCase().replace(/\s+/g, '-')}`,
         }));
 
-        const allCategories = [{ id: null, name: 'All', path: '/all' }, ...apiCategories];
+        const allCategories = [{ id: 'all', name: 'All', path: '/all' }, ...apiCategories];
         const categoriesWithIcons = allCategories.map(category => ({
           ...category,
           icon: getCategoryIcon(category.name),
@@ -67,11 +66,11 @@ function Find() {
         console.error('Fetch Categories Error:', err);
         setErrorCategories(err.message || 'Failed to fetch categories');
         setCategories([
-          { id: null, name: 'All', icon: getCategoryIcon('All'), path: '/all' },
-          { id: 1, name: 'Language and Communication', icon: getCategoryIcon('Language and Communication'), path: '/language' },
-          { id: 2, name: 'Music and Arts', icon: getCategoryIcon('Music and Arts'), path: '/music' },
-          { id: 3, name: 'Technology and Innovation', icon: getCategoryIcon('Technology and Innovation'), path: '/technology' },
-          { id: 4, name: 'Cooking and Baking', icon: getCategoryIcon('Cooking and Baking'), path: '/cooking' },
+          { id: 'all', name: 'All', icon: getCategoryIcon('All'), path: '/all' },
+          { id: '1', name: 'Language and Communication', icon: getCategoryIcon('Language and Communication'), path: '/language' },
+          { id: '2', name: 'Music and Arts', icon: getCategoryIcon('Music and Arts'), path: '/music' },
+          { id: '3', name: 'Technology and Innovation', icon: getCategoryIcon('Technology and Innovation'), path: '/technology' },
+          { id: '4', name: 'Cooking and Baking', icon: getCategoryIcon('Cooking and Baking'), path: '/cooking' },
         ]);
       } finally {
         setLoadingCategories(false);
@@ -86,7 +85,7 @@ function Find() {
       setLoadingPosts(true);
       setErrorPosts(null);
       try {
-        let url = 'https://db60-2403-6200-88a2-308d-1a2-2c41-9dc7-22a9.ngrok-free.app/moment';
+        let url = 'https://35420d9f0ddb.ngrok-free.app/moment';
         if (selectedCategoryId !== null) {
           url += `?categoryId=${selectedCategoryId}`;
         }
@@ -97,8 +96,7 @@ function Find() {
           },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const text = await response.text();
-        const data = JSON.parse(text);
+        const data = await response.json();
         console.log('Posts API Response:', data);
         setPosts(data);
       } catch (err) {
@@ -139,7 +137,6 @@ function Find() {
 
   const handleTouchMove = (e) => {
     if (!scrollRef.current || touchStart === null) return;
-
     const touchCurrent = e.touches[0].clientX;
     const diff = touchStart - touchCurrent;
     scrollRef.current.scrollLeft += diff;
@@ -225,9 +222,8 @@ function Find() {
                   onTouchEnd={handleTouchEnd}
                 >
                   {categories.map((category) => (
-                    <div className="relative inline-block group">
+                    <div key={category.id ?? category.name} className="relative inline-block group">
                       <Link
-                        key={category.name}
                         to="#"
                         onClick={(e) => {
                           e.preventDefault();

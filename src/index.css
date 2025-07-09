@@ -79,6 +79,13 @@ body {
   display: none;
 }
 
+.add-media-button {
+  background-color: #FEF4F4 !important;
+  color: #333333 !important;
+  border: unset !important;
+}
+
+
 @media (prefers-color-scheme: light) {
   :root {
     background-color: #ffffff;

@@ -17,7 +17,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('https://4010-49-237-38-131.ngrok-free.app/auth/login/', {
+      const response = await fetch('https://35420d9f0ddb.ngrok-free.app/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
