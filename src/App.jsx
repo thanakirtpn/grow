@@ -14,6 +14,7 @@ import Skills from './WelcomPage/Skills';
 import Lasttab from './WelcomPage/Lasttab';
 import Find from './WelcomPage/Find';
 import Homepost from './Signin/Homepost';
+import TalkPage from './TalkPage/TalkPage'; 
 
 
 function App() {
@@ -40,6 +41,9 @@ function App() {
           <Route path='/JoinNow' element={<JoinNow />} />
           <Route path='/Find' element={<Find />} />
           <Route path='/Homepost' element={<Homepost />} />
+          <Route path="/talk" element={<TalkPage />} />
+
+          
         </Routes>
       </div>
     </Router>

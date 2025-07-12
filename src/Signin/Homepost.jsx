@@ -6,6 +6,7 @@ import myImageS from '../assets/Setup.png';
 import myImageL from '../assets/Left2.png';
 import myImageR from '../assets/Right.png';
 import Post from './Post';
+import Header from '../components/header';
 
 const Homepost = () => {
   const [posts, setPosts] = useState([]);
@@ -344,7 +345,7 @@ const Homepost = () => {
 
   return (
     <div className="bg-white min-h-screen">
-      <nav className="bg-white p-4 sm:p-6 md:p-8">
+      {/* <nav className="bg-white p-4 sm:p-6 md:p-8">
         <div className="container mx-auto flex justify-between items-center">
           <Link
             to="/"
@@ -430,7 +431,9 @@ const Homepost = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> */}
+      <Header />
+
       {showCategories && (
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg mx-auto max-w-screen-lg">
           {loadingCategories && <p className="text-center text-gray-700">Loading categories...</p>}
