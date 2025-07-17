@@ -1,21 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/header';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 
 const TalkPage = () => {
+  const [selectedChat, setSelectedChat] = useState(null);
+
   return (
-    <div className="min-h-screen flex flex-col bg-white text-black">
-      {/* Header */}
+    <div className="h-screen flex flex-col overflow-hidden bg-[#FDFBFC]">
       <Header />
 
-      {/* Main Chat Area */}
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-full md:w-[300px] border-r border-gray-200">
-          <ChatSidebar />
+      <div className="flex flex-1 overflow-hidden w-full max-w-7xl mx-auto px-[4rem] pb-4 gap-4">
+        {/* Sidebar */}
+        <div className="w-full md:w-[300px]">
+          <ChatSidebar onSelectChat={setSelectedChat} />
         </div>
-        <div className="flex-1">
-          <ChatWindow />
+
+        {/* Chat window */}
+        <div className="flex-1 overflow-hidden">
+          {selectedChat ? (
+            <ChatWindow chat={selectedChat} />
+          ) : (
+            <div className="h-full flex items-center justify-center text-gray-400">
+              Select a chat to start messaging
+            </div>
+          )}
         </div>
       </div>
     </div>
