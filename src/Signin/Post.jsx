@@ -31,7 +31,7 @@ function Post({ post }) {
   useEffect(() => {
     const loadImages = async () => {
       if (post.images?.length > 0 && post.images[0]?.image_url && !imageError) {
-        const url = `https://35420d9f0ddb.ngrok-free.app${post.images[0].image_url.startsWith('/') ? '' : '/'}${post.images[0].image_url}`;
+        const url = `https://0b02e4248cf5.ngrok-free.app${post.images[0].image_url.startsWith('/') ? '' : '/'}${post.images[0].image_url}`;
         const src = await fetchImage(url);
         setImageSrc(src || defaultImage);
       } else {
@@ -39,7 +39,7 @@ function Post({ post }) {
       }
 
       if (post.user?.profile_picture && !profileError) {
-        const url = `https://35420d9f0ddb.ngrok-free.app${post.user.profile_picture.startsWith('/') ? '' : '/'}${post.user.profile_picture}`;
+        const url = `https://0b02e4248cf5.ngrok-free.app${post.user.profile_picture.startsWith('/') ? '' : '/'}${post.user.profile_picture}`;
         const src = await fetchImage(url);
         setProfileSrc(src || defaultProfile);
       } else {

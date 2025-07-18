@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from '../components/header';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
+console.log('API_BASE_URL =', import.meta.env.VITE_API_BASE_URL);
 
 const TalkPage = () => {
   const [selectedChat, setSelectedChat] = useState(null);

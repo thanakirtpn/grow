@@ -41,7 +41,7 @@ function Find() {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
-        const response = await fetch('https://35420d9f0ddb.ngrok-free.app/moment/categories', {
+        const response = await fetch('https://0b02e4248cf5.ngrok-free.app/moment/categories', {
           headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -85,7 +85,7 @@ function Find() {
       setLoadingPosts(true);
       setErrorPosts(null);
       try {
-        let url = 'https://35420d9f0ddb.ngrok-free.app/moment';
+        let url = 'https://0b02e4248cf5.ngrok-free.app/moment';
         if (selectedCategoryId !== null) {
           url += `?categoryId=${selectedCategoryId}`;
         }
@@ -149,7 +149,7 @@ function Find() {
 
   return (
     <nav className="bg-white p-4 sm:p-6 md:p-8">
-      <div className="container mx-auto flex justify-between items-center">
+      {/* <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center text-black font-bold text-3xl sm:text-4xl md:text-5xl hover:text-gray-900" aria-label="Go to homepage">
           <img src={myImageG} alt="GlowTogether Logo" className="h-5 sm:h-10 md:h-12 object-contain" />
         </Link>
@@ -197,7 +197,7 @@ function Find() {
             Join Now
           </Link>
         </div>
-      </div>
+      </div> */}
       {showCategories && (
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg mx-auto max-w-screen-lg">
           {loadingCategories && <p className="text-center text-gray-700">Loading categories...</p>}

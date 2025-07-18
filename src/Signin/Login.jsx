@@ -17,7 +17,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('https://35420d9f0ddb.ngrok-free.app/auth/login/', {
+      const response = await fetch('https://0b02e4248cf5.ngrok-free.app/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -28,6 +28,7 @@ function Login() {
       }
       console.log('Login successful, Token:', data.token);
       localStorage.setItem('authToken', data.token);
+      localStorage.setItem('userId', data.user.id); // ✅ จำเป็นมาก เพื่อให้ ChatSidebar และ ChatWindow ทำงานได้ เรื่อง bubble
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
       }

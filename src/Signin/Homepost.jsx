@@ -53,7 +53,7 @@ const Homepost = () => {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
-        const response = await fetch('https://35420d9f0ddb.ngrok-free.app/moment/categories', {
+        const response = await fetch('https://0b02e4248cf5.ngrok-free.app/moment/categories', {
           headers: { Accept: 'application/json', 'ngrok-skip-browser-warning': 'true' },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -99,7 +99,7 @@ const Homepost = () => {
         return;
       }
       try {
-        let url = 'https://35420d9f0ddb.ngrok-free.app/api/posts';
+        let url = 'https://0b02e4248cf5.ngrok-free.app/api/posts';
         if (selectedCategoryId !== null) {
           url += `?categoryId=${selectedCategoryId}`;
         }
@@ -150,7 +150,7 @@ const Homepost = () => {
         'ngrok-skip-browser-warning': 'true',
       };
       try {
-        const profileResponse = await fetch('https://35420d9f0ddb.ngrok-free.app/api/profile/me', { headers });
+        const profileResponse = await fetch('https://0b02e4248cf5.ngrok-free.app/api/profile/me', { headers });
         if (!profileResponse.ok) {
           throw new Error(`HTTP error! Status: ${profileResponse.status}`);
         }
@@ -165,11 +165,11 @@ const Homepost = () => {
         if (storedProfileUrl) {
           profileImage = storedProfileUrl;
         } else if (profileData.profileImage) {
-          profileImage = `https://35420d9f0ddb.ngrok-free.app${profileData.profileImage.startsWith('/') ? '' : '/'}${profileData.profileImage}`;
+          profileImage = `https://0b02e4248cf5.ngrok-free.app${profileData.profileImage.startsWith('/') ? '' : '/'}${profileData.profileImage}`;
         } else if (profileData.profile_picture) {
-          profileImage = `https://35420d9f0ddb.ngrok-free.app${profileData.profile_picture.startsWith('/') ? '' : '/'}${profileData.profile_picture}`;
+          profileImage = `https://0b02e4248cf5.ngrok-free.app${profileData.profile_picture.startsWith('/') ? '' : '/'}${profileData.profile_picture}`;
         } else if (posts.length > 0 && posts[0]?.user?.profile_picture) {
-          profileImage = `https://35420d9f0ddb.ngrok-free.app${posts[0].user.profile_picture.startsWith('/') ? '' : '/'}${posts[0].user.profile_picture}`;
+          profileImage = `https://0b02e4248cf5.ngrok-free.app${posts[0].user.profile_picture.startsWith('/') ? '' : '/'}${posts[0].user.profile_picture}`;
         }
 
         if (profileImage) {
@@ -258,7 +258,7 @@ const Homepost = () => {
     }
 
     try {
-      const response = await fetch('https://35420d9f0ddb.ngrok-free.app/api/posts', {
+      const response = await fetch('https://0b02e4248cf5.ngrok-free.app/api/posts', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -276,7 +276,7 @@ const Homepost = () => {
             text: newPost.text,
             category: selectedCat?.name || category,
             image_url: newPost.image_url
-              ? `https://35420d9f0ddb.ngrok-free.app${newPost.image_url.startsWith('/') ? '' : '/'}${newPost.image_url}`
+              ? `https://0b02e4248cf5.ngrok-free.app${newPost.image_url.startsWith('/') ? '' : '/'}${newPost.image_url}`
               : null,
             user: { name: userName, profile_picture: profileImageUrl },
           },

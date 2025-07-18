@@ -24,7 +24,7 @@ const Header = () => {
         {/* Navigation */}
         <nav className="flex-1 flex justify-center">
           <ul className="flex gap-6 text-[#333333] text-sm font-normal poppins-font">
-            <li><Link className="hover:text-[#C53678]">Talk</Link></li>
+            <li><Link to="/talk" className="hover:text-[#C53678]">Talk</Link></li>
             <li><Link className="hover:text-[#C53678]">Find</Link></li>
             <li>
               <Link
@@ -49,3 +49,4 @@ const Header = () => {
 };
 
 export default Header;
+

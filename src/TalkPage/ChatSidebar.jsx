@@ -1,54 +1,109 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import { HiDotsHorizontal } from 'react-icons/hi';
+import defaultAvatar from '../assets/no_pic.jpg'; // fallback image
 
 const ChatSidebar = ({ onSelectChat }) => {
   const [activeTab, setActiveTab] = useState('inbox');
   const [selectedChat, setSelectedChat] = useState({ tab: '', index: -1 });
+  const [chatData, setChatData] = useState({ inbox: [], request: [], following: [] });
+
+  const navigate = useNavigate();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const fetchData = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return navigate('/login');
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'ngrok-skip-browser-warning': 'true',
+    };
+
+    try {
+      // Always fetch inbox
+      const resInbox = await fetch(`${API_BASE_URL}/api/talk/chats`, { headers });
+      if (resInbox.status === 401) return navigate('/login');
+      const dataInbox = await resInbox.json();
+      const formattedInbox = (dataInbox?.chats || []).map(chat => ({
+        id: chat.userId,
+        name: chat.username,
+        avatar: chat.avatar || null,
+        message: chat.lastMessage,
+        time: new Date(chat.lastMessageTime).toISOString(),
+        unread: 0,
+        online: true,
+        status: 'ACCEPTED',
+      }));
+
+      // Always fetch requests too
+      const resRequest = await fetch(`${API_BASE_URL}/api/talk/requests`, { headers });
+      if (resRequest.status === 401) return navigate('/login');
+      const dataRequest = await resRequest.json();
+      const senderMap = new Map();
+      (dataRequest?.requests || []).forEach((r) => {
+        const existing = senderMap.get(r.senderId);
+
+        if (!existing) {
+          senderMap.set(r.senderId, {
+            senderId: r.senderId,
+            senderUsername: r.senderUsername,
+            senderAvatar: r.senderAvatar || null,
+            message: r.message,
+            created_at: r.created_at,
+            status: r.status,
+            count: 1, // เริ่มต้น
+          });
+        } else {
+          existing.count += 1;
+
+          // เก็บข้อความล่าสุด
+          if (new Date(r.created_at) > new Date(existing.created_at)) {
+            existing.message = r.message;
+            existing.created_at = r.created_at;
+          }
+        }
+      });
+
+      const formattedRequest = [];
+
+      senderMap.forEach((r) => {
+        formattedRequest.push({
+          id: r.senderId,
+          name: r.senderUsername,
+          avatar: r.senderAvatar,
+          message: r.message,
+          time: new Date(r.created_at).toISOString(),
+          unread: r.count, // ✅ จำนวนข้อความจริง
+          online: true,
+          status: r.status,
+        });
+      });
+
+
+
+      // Merge data
+      setChatData(prev => ({
+        ...prev,
+        inbox: formattedInbox,
+        request: formattedRequest,
+      }));
+    } catch (err) {
+      console.error('Error fetching chats:', err);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchData();
+  }, [activeTab]);
 
   const tabs = [
     { label: 'Inbox', key: 'inbox' },
     { label: 'Following', key: 'following' },
-    { label: 'Request', key: 'request', badge: 12 },
+    { label: 'Request', key: 'request', badge: chatData.request.length || 0 },
   ];
-
-  const chatData = {
-    inbox: [
-      {
-        name: 'John Doe',
-        time: '10:00',
-        message: 'Hello from inbox...',
-        avatar: 'https://randomuser.me/api/portraits/men/11.jpg',
-        unread: 2,
-        online: true,
-      },
-      {
-        name: 'Emma Watson',
-        time: '11:15',
-        message: 'Are we still on for today?',
-        avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
-        unread: 0,
-        online: false,
-      },
-    ],
-    request: [
-      {
-        name: 'McKinsey Vermillion',
-        time: '12:25',
-        message: 'Enter your message description here...Enter your message description here...Enter your message description here...',
-        avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-        unread: 2,
-        online: true,
-      },
-    ],
-    following: [
-      {
-        name: 'Alice Smith',
-        avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-        online: true,
-      },
-    ],
-  };
 
   return (
     <div className="h-full flex flex-col">
@@ -59,7 +114,6 @@ const ChatSidebar = ({ onSelectChat }) => {
             <HiDotsHorizontal className="text-gray-500 mr-2 text-xl" />
             <h2 className="text-xl font-bold text-gray-800">Chats</h2>
           </div>
-
           <div className="relative mb-4">
             <input
               type="text"
@@ -88,7 +142,7 @@ const ChatSidebar = ({ onSelectChat }) => {
                   }}
                 >
                   <span>{tab.label}</span>
-                  {tab.badge && tab.key === 'request' && (
+                  {tab.badge > 0 && tab.key === 'request' && (
                     <span className="bg-[#FFE5E9] text-[#FF5B35] rounded-full text-[9px] min-w-[1rem] h-4 font-semibold flex items-center justify-center leading-none">
                       {tab.badge}
                     </span>
@@ -106,8 +160,11 @@ const ChatSidebar = ({ onSelectChat }) => {
         <div className="flex-1 overflow-y-auto pt-0">
           <ul className="text-sm">
             {chatData[activeTab].map((chat, index) => {
-              const isSelected =
-                selectedChat.tab === activeTab && selectedChat.index === index;
+              const isSelected = selectedChat.tab === activeTab && selectedChat.index === index;
+              const avatarSrc =
+                chat.avatar && chat.avatar !== 'null' && chat.avatar !== 'undefined'
+                  ? chat.avatar
+                  : defaultAvatar;
 
               return (
                 <li
@@ -117,46 +174,36 @@ const ChatSidebar = ({ onSelectChat }) => {
                   }`}
                   onClick={() => {
                     setSelectedChat({ tab: activeTab, index });
-
-                    // ส่งข้อมูลแชทไปยัง ChatWindow
                     if (onSelectChat) {
                       onSelectChat({
+                        id: chat.id,
+                        userId: chat.id,
                         name: chat.name,
-                        avatar: chat.avatar,
-                        lastSeen: chat.time || 'recently',
-                        messages: [
-                          { from: 'me', text: 'Hey, how are you?', time: '12:25' },
-                          { from: 'them', text: chat.message || 'Hello!', time: chat.time || '12:25' },
-                          { from: 'them', text: 'Let’s catch up soon.', time: '02:25' }
-                        ]
+                        avatar: avatarSrc,
+                        lastSeen: chat.time,
+                        messages: [],
+                        status: chat.status, // ✅ ส่ง status ตรง ๆ
                       });
                     }
                   }}
                 >
                   <div className="relative w-10 h-10 flex-shrink-0">
-                    <img
-                      src={chat.avatar}
-                      alt="Avatar"
-                      className="w-full h-full rounded-full object-cover"
-                    />
+                    <img src={avatarSrc} alt="Avatar" className="w-full h-full rounded-full object-cover" />
                     {chat.online && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                     )}
                   </div>
-
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex items-center justify-between w-full">
-                      <p className="font-semibold text-gray-800 truncate pr-2">
-                        {chat.name}
-                      </p>
-                      {activeTab !== 'following' && chat.time && (
-                        <span className="text-xs text-gray-400 ml-2 whitespace-nowrap">
-                          {chat.time}
-                        </span>
-                      )}
+                      <p className="font-semibold text-gray-800 truncate pr-2">{chat.name}</p>
+                      <span className="text-xs text-gray-400 ml-2 whitespace-nowrap">
+                        {new Date(chat.time).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
                     </div>
-
-                    {activeTab !== 'following' && chat.message && (
+                    {chat.message && (
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-xs font-normal truncate pr-2">
                           {chat.message}
@@ -172,7 +219,6 @@ const ChatSidebar = ({ onSelectChat }) => {
                 </li>
               );
             })}
-
             {chatData[activeTab].length === 0 && (
               <li className="px-4 text-sm text-gray-400">No messages</li>
             )}
