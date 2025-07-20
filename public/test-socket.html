@@ -1,4 +1,3 @@
-<!-- filename: video-call-test.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +5,56 @@
   <title>Socket.IO Audio/Video Call Test</title>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 2rem; background: #f8f8f8; }
-    #log { background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #ccc; height: 300px; overflow-y: scroll; margin-top: 1rem; font-family: monospace; white-space: pre-wrap; }
-    input, button { margin: 0.25rem; padding: 0.5rem; }
-    video { border-radius: 8px; margin-top: 1rem; }
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f8f8f8;
+    }
+
+    #log {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      height: 300px;
+      overflow-y: scroll;
+      margin-top: 1rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    input, button {
+      margin: 0.25rem;
+      padding: 0.5rem;
+    }
+
+    #videoContainer {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      justify-content: center;
+    }
+
+    .video-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .video-label {
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+      color: #444;
+    }
+
+    video {
+      width: 300px;
+      height: 225px;
+      background: #000;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -37,8 +82,18 @@
     <button onclick="cancelCall()">📵 Cancel</button>
   </div>
 
-  <video id="localVideo" autoplay playsinline muted style="width: 200px; display: none;"></video>
-  <video id="remoteVideo" autoplay playsinline style="width: 300px; display: none;"></video>
+  <!-- 👇 วิดีโอ 2 จอ พร้อมชื่อกำกับ -->
+  <div id="videoContainer">
+    <div class="video-box">
+      <div class="video-label">You</div>
+      <video id="localVideo" autoplay playsinline muted style="display: none;"></video>
+    </div>
+    <div class="video-box">
+      <div class="video-label">Partner</div>
+      <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+    </div>
+  </div>
+
   <audio id="remoteAudio" autoplay></audio>
   <div id="log"></div>
 
