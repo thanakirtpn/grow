@@ -31,7 +31,6 @@ const ChatSidebar = ({ onSelectChat }) => {
       const resInbox = await fetch(`${API_BASE_URL}/api/talk/chats`, { headers });
       if (resInbox.status === 401) return navigate('/login');
       const dataInbox = await resInbox.json();
-
       const formattedInbox = (dataInbox?.chats || []).map(chat => {
         const avatar = getAvatarUrl(chat.avatar);
         return {
@@ -49,7 +48,6 @@ const ChatSidebar = ({ onSelectChat }) => {
       const resRequest = await fetch(`${API_BASE_URL}/api/talk/requests`, { headers });
       if (resRequest.status === 401) return navigate('/login');
       const dataRequest = await resRequest.json();
-
       const senderMap = new Map();
       (dataRequest?.requests || []).forEach((r) => {
         const existing = senderMap.get(r.senderId);
@@ -185,10 +183,8 @@ const ChatSidebar = ({ onSelectChat }) => {
                     <img
                       src={avatarSrc}
                       alt="Avatar"
+                      onError={(e) => (e.currentTarget.src = defaultAvatar)}
                       className="w-full h-full rounded-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = defaultAvatar;
-                      }}
                     />
                     {chat.online && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
