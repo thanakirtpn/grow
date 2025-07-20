@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fi';
 import defaultAvatar from '../assets/no_pic.jpg';
 
-const ChatWindow = ({ chat }) => {
+const ChatWindow = ({ chat, myId }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
@@ -29,13 +29,15 @@ const ChatWindow = ({ chat }) => {
         });
 
         const data = await res.json();
-        const myId = parseInt(localStorage.getItem('userId'));
 
         const formatted = (data.messages || []).map((msg) => ({
           text: msg.content,
           time: msg.sent_at,
           fromSelf: msg.sender_id === myId,
           isRequest: msg.is_request,
+          isRead: msg.is_read,
+          isDelivered: msg.is_delivered,
+          isFailed: msg.is_failed,
         }));
 
         setMessages(formatted);
@@ -51,7 +53,6 @@ const ChatWindow = ({ chat }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ✅ เพิ่มฟังก์ชันนี้เข้าไปเพื่อดึงสถานะ connection สดจาก backend
   const fetchConnectionStatus = async () => {
     const token = localStorage.getItem('authToken');
     const res = await fetch(`${API_BASE_URL}/api/talk/chats`, {
@@ -114,6 +115,9 @@ const ChatWindow = ({ chat }) => {
           time: now,
           fromSelf: true,
           isRequest: status === 'PENDING',
+          isRead: false,
+          isDelivered: true,
+          isFailed: false,
         },
       ]);
 
@@ -170,6 +174,29 @@ const ChatWindow = ({ chat }) => {
       console.error('Decline error:', err);
     }
   };
+  const handleAudioCall = () => {
+    const state = {
+      receiverId: chat.userId,
+      receiverName: chat.name,
+      receiverAvatar: chat.avatar,
+    };
+
+    const width = 400;
+    const height = 600;
+    const left = window.screenX + (window.innerWidth - width) / 2;
+    const top = window.screenY + (window.innerHeight - height) / 2;
+
+    const features = `width=${width},height=${height},left=${left},top=${top},resizable=no,toolbar=no,menubar=no,scrollbars=no`;
+
+    window.open(
+      `/audio-call?data=${encodeURIComponent(JSON.stringify(state))}`,
+      'audioCallPopup',
+      features
+    );
+  };
+
+
+
 
   const formatTime = (isoStr) => {
     if (!isoStr) return '';
@@ -208,7 +235,6 @@ const ChatWindow = ({ chat }) => {
   return (
     <div className="h-full w-full flex flex-col">
       <div className="flex flex-col flex-1 rounded-xl border border-gray-200 shadow-sm bg-[#FDFBFC] overflow-hidden">
-        {/* Header */}
         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-white rounded-t-xl">
           <div className="flex items-center gap-3">
             <img src={avatarSrc} className="w-10 h-10 rounded-full object-cover" alt="avatar" />
@@ -219,17 +245,12 @@ const ChatWindow = ({ chat }) => {
               </div>
             </div>
           </div>
-          <div className="flex gap-2 pr-1">
-            <button className="p-2 rounded-full hover:bg-gray-100 transition">
-              <FiPhone size={18} className="text-[#C53678]" />
-            </button>
-            <button className="p-2 rounded-full hover:bg-gray-100 transition">
-              <FiVideo size={18} className="text-[#C53678]" />
-            </button>
+          <div className="flex gap-3 pr-1">
+            <FiPhone size={20} className="text-[#C53678] cursor-pointer" onClick={handleAudioCall} />
+            <FiVideo size={20} className="text-[#C53678] cursor-pointer" />
           </div>
         </div>
 
-        {/* Chat Body */}
         <div className="flex-1 px-6 py-4 overflow-y-auto space-y-6 text-sm text-gray-800 bg-[#FDFBFC]">
           {messages.length === 0 && (
             <div className="text-center text-sm text-gray-400">No messages yet</div>
@@ -252,7 +273,20 @@ const ChatWindow = ({ chat }) => {
                   >
                     {msg.text}
                   </div>
-                  <div className="text-[10px] text-gray-400">{formatTime(msg.time)}</div>
+                  <div className="text-[10px] text-gray-400">
+                    {formatTime(msg.time)}
+                    {msg.fromSelf && (
+                      <>
+                        {msg.isRead
+                          ? ', Read'
+                          : msg.isDelivered
+                          ? ', Delivered'
+                          : msg.isFailed
+                          ? ', Failed'
+                          : ', Sent'}
+                      </>
+                    )}
+                  </div>
                 </div>
               </React.Fragment>
             );
@@ -260,8 +294,7 @@ const ChatWindow = ({ chat }) => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Footer */}
-        {chat.status === 'PENDING' ? (
+        {chat.status === 'PENDING' && chat.userId !== myId ? (
           <div className="border-t border-gray-200 bg-[#FFF2F4] text-center p-6 space-y-3">
             <h3 className="text-sm font-semibold text-gray-800">New Conversation Request</h3>
             <p className="text-sm text-gray-600">

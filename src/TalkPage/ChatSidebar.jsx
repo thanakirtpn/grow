@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import { HiDotsHorizontal } from 'react-icons/hi';
-import defaultAvatar from '../assets/no_pic.jpg'; // fallback image
+import defaultAvatar from '../assets/no_pic.jpg';
 
 const ChatSidebar = ({ onSelectChat }) => {
   const [activeTab, setActiveTab] = useState('inbox');
@@ -22,29 +22,33 @@ const ChatSidebar = ({ onSelectChat }) => {
     };
 
     try {
-      // Always fetch inbox
       const resInbox = await fetch(`${API_BASE_URL}/api/talk/chats`, { headers });
       if (resInbox.status === 401) return navigate('/login');
       const dataInbox = await resInbox.json();
-      const formattedInbox = (dataInbox?.chats || []).map(chat => ({
-        id: chat.userId,
-        name: chat.username,
-        avatar: chat.avatar || null,
-        message: chat.lastMessage,
-        time: new Date(chat.lastMessageTime).toISOString(),
-        unread: 0,
-        online: true,
-        status: 'ACCEPTED',
-      }));
+      const formattedInbox = (dataInbox?.chats || []).map(chat => {
+        const avatar =
+          chat.avatar && chat.avatar !== 'null' && chat.avatar !== 'undefined'
+            ? new URL(chat.avatar, API_BASE_URL).href
+            : null;
 
-      // Always fetch requests too
+        return {
+          id: chat.userId,
+          name: chat.username,
+          avatar,
+          message: chat.lastMessage,
+          time: new Date(chat.lastMessageTime).toISOString(),
+          unread: 0,
+          online: true,
+          status: chat.status,
+        };
+      });
+
       const resRequest = await fetch(`${API_BASE_URL}/api/talk/requests`, { headers });
       if (resRequest.status === 401) return navigate('/login');
       const dataRequest = await resRequest.json();
       const senderMap = new Map();
       (dataRequest?.requests || []).forEach((r) => {
         const existing = senderMap.get(r.senderId);
-
         if (!existing) {
           senderMap.set(r.senderId, {
             senderId: r.senderId,
@@ -53,12 +57,10 @@ const ChatSidebar = ({ onSelectChat }) => {
             message: r.message,
             created_at: r.created_at,
             status: r.status,
-            count: 1, // เริ่มต้น
+            count: 1,
           });
         } else {
           existing.count += 1;
-
-          // เก็บข้อความล่าสุด
           if (new Date(r.created_at) > new Date(existing.created_at)) {
             existing.message = r.message;
             existing.created_at = r.created_at;
@@ -67,23 +69,24 @@ const ChatSidebar = ({ onSelectChat }) => {
       });
 
       const formattedRequest = [];
-
       senderMap.forEach((r) => {
+        const avatar =
+          r.senderAvatar && r.senderAvatar !== 'null' && r.senderAvatar !== 'undefined'
+            ? new URL(r.senderAvatar, API_BASE_URL).href
+            : null;
+
         formattedRequest.push({
           id: r.senderId,
           name: r.senderUsername,
-          avatar: r.senderAvatar,
+          avatar,
           message: r.message,
           time: new Date(r.created_at).toISOString(),
-          unread: r.count, // ✅ จำนวนข้อความจริง
+          unread: r.count,
           online: true,
           status: r.status,
         });
       });
 
-
-
-      // Merge data
       setChatData(prev => ({
         ...prev,
         inbox: formattedInbox,
@@ -93,7 +96,6 @@ const ChatSidebar = ({ onSelectChat }) => {
       console.error('Error fetching chats:', err);
     }
   };
-
 
   useEffect(() => {
     fetchData();
@@ -108,7 +110,6 @@ const ChatSidebar = ({ onSelectChat }) => {
   return (
     <div className="h-full flex flex-col">
       <div className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm h-full">
-        {/* Header + Search */}
         <div className="p-4 pb-0">
           <div className="flex items-center mb-4">
             <HiDotsHorizontal className="text-gray-500 mr-2 text-xl" />
@@ -124,7 +125,6 @@ const ChatSidebar = ({ onSelectChat }) => {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="relative">
           <div className="w-full border-b border-gray-300">
             <div className="grid grid-cols-3 text-sm font-medium relative z-0">
@@ -132,9 +132,7 @@ const ChatSidebar = ({ onSelectChat }) => {
                 <button
                   key={tab.key}
                   className={`relative flex items-center justify-center gap-1 pb-2 pt-1 transition-all duration-200 !bg-transparent z-10 ${
-                    activeTab === tab.key
-                      ? '!text-black'
-                      : '!text-black text-opacity-50'
+                    activeTab === tab.key ? '!text-black' : '!text-black text-opacity-50'
                   }`}
                   onClick={() => {
                     setActiveTab(tab.key);
@@ -156,15 +154,11 @@ const ChatSidebar = ({ onSelectChat }) => {
           </div>
         </div>
 
-        {/* Chat List */}
         <div className="flex-1 overflow-y-auto pt-0">
           <ul className="text-sm">
             {chatData[activeTab].map((chat, index) => {
               const isSelected = selectedChat.tab === activeTab && selectedChat.index === index;
-              const avatarSrc =
-                chat.avatar && chat.avatar !== 'null' && chat.avatar !== 'undefined'
-                  ? chat.avatar
-                  : defaultAvatar;
+              const avatarSrc = chat.avatar || defaultAvatar;
 
               return (
                 <li
@@ -182,7 +176,7 @@ const ChatSidebar = ({ onSelectChat }) => {
                         avatar: avatarSrc,
                         lastSeen: chat.time,
                         messages: [],
-                        status: chat.status, // ✅ ส่ง status ตรง ๆ
+                        status: chat.status,
                       });
                     }
                   }}
@@ -205,9 +199,7 @@ const ChatSidebar = ({ onSelectChat }) => {
                     </div>
                     {chat.message && (
                       <div className="flex items-center justify-between">
-                        <p className="text-gray-500 text-xs font-normal truncate pr-2">
-                          {chat.message}
-                        </p>
+                        <p className="text-gray-500 text-xs font-normal truncate pr-2">{chat.message}</p>
                         {chat.unread > 0 && (
                           <span className="text-white bg-[#FF5B35] text-[9px] font-semibold rounded-full min-w-[1rem] h-4 flex-shrink-0 flex items-center justify-center leading-none">
                             {chat.unread}
