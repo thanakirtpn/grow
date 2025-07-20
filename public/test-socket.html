@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Socket.IO Video Call Fixed</title>
+  <title>Socket.IO Audio/Video Call Test</title>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     body {
@@ -10,30 +10,7 @@
       padding: 2rem;
       background: #f8f8f8;
     }
-    #videoContainer {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-      justify-content: center;
-    }
-    .video-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .video-label {
-      font-weight: bold;
-      margin-bottom: 0.25rem;
-      font-size: 1rem;
-      color: #444;
-    }
-    video {
-      width: 300px;
-      height: 225px;
-      background: #000;
-      border-radius: 10px;
-      border: 2px solid #ccc;
-    }
+
     #log {
       background: #fff;
       padding: 1rem;
@@ -45,14 +22,43 @@
       font-family: monospace;
       white-space: pre-wrap;
     }
+
     input, button {
       margin: 0.25rem;
       padding: 0.5rem;
     }
+
+    #videoContainer {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      justify-content: center;
+    }
+
+    .video-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .video-label {
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+      color: #444;
+    }
+
+    video {
+      width: 300px;
+      height: 225px;
+      background: #000;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+    }
   </style>
 </head>
 <body>
-  <h1>📡 Socket.IO Video Call Fixed</h1>
+  <h1>📡 Socket.IO Audio/Video Call Test</h1>
 
   <div>
     <label><b>Your User ID:</b></label>
@@ -76,6 +82,7 @@
     <button onclick="cancelCall()">📵 Cancel</button>
   </div>
 
+  <!-- 👇 วิดีโอ 2 จอ พร้อมชื่อกำกับ -->
   <div id="videoContainer">
     <div class="video-box">
       <div class="video-label">You</div>
@@ -100,7 +107,7 @@
     let myUserId = null;
     let otherUserId = null;
     let callType = 'VOICE';
-    let incomingCallType = 'VOICE';
+    let incomingCallType = 'VOICE'; // 👈 สำคัญมาก
     const iceQueue = [];
 
     const iceServers = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
@@ -129,23 +136,23 @@
         otherUserId = call.from;
         isCaller = false;
         callStatus = 'RINGING';
-        incomingCallType = call.type || 'VOICE';
+        incomingCallType = call.type || 'VOICE'; // 👈 จดจำว่าเป็น 'VIDEO'
       });
 
-      socket.on('call_started', ({ callId }) => {
+      socket.on('call_started', async ({ callId }) => {
         currentCallId = callId;
         otherUserId = Number(document.getElementById('receiverId').value);
         isCaller = true;
         callStatus = 'RINGING';
         log(`📞 Call started with ID ${callId}`);
-        // ❌ ห้ามเปิดกล้องตรงนี้
+        await startLocalPreview(); // Caller เห็นตัวเอง
       });
 
       socket.on('call_accepted', async (data) => {
         log(`✅ Call accepted: ${JSON.stringify(data)}`);
         callType = data.type || 'VOICE';
         callStatus = 'ONGOING';
-        await startLocalPreview();
+        await startLocalPreview();     // Receiver เห็นตัวเอง
         await startWebRTC(isCaller);
       });
 
@@ -197,13 +204,16 @@
     }
 
     function sendMessage() {
-      const content = document.getElementById('message').value;
+      if (!socket || !socket.connected) return log('⚠️ Not connected');
+      const senderId = myUserId;
       const receiverId = Number(document.getElementById('receiverId').value);
-      socket.emit('send_message', { senderId: myUserId, receiverId, content });
+      const content = document.getElementById('message').value;
+      socket.emit('send_message', { senderId, receiverId, content });
       log(`➡️ Emitted send_message`);
     }
 
     function startCall(type) {
+      if (!socket || !socket.connected) return log('⚠️ Not connected');
       callType = type;
       const callerId = myUserId;
       const receiverId = Number(document.getElementById('receiverId').value);
@@ -213,36 +223,42 @@
 
     async function acceptCall() {
       if (!currentCallId) return log('⚠️ No call to accept');
-      callType = incomingCallType;
+      callType = incomingCallType; // 👈 เซ็ตก่อนเปิดกล้อง
+      log('[DEBUG] acceptCall with callType = ' + callType);
       socket.emit('accept_call', { callId: currentCallId, receiverId: myUserId });
       log('✅ Emitted accept_call');
       callStatus = 'ONGOING';
-      await startLocalPreview();
+      await startLocalPreview();  // ✅ เปิดกล้องฝั่งรับ
       await startWebRTC(false);
     }
 
     function declineCall() {
+      if (!currentCallId) return log('⚠️ No call to decline');
       socket.emit('decline_call', { callId: currentCallId, receiverId: myUserId });
+      log('❌ Emitted decline_call');
       cleanup();
     }
 
     function endCall() {
+      if (!currentCallId || callStatus !== 'ONGOING') return log('⚠️ No active call to end');
       socket.emit('end_call', { callId: currentCallId, userId: myUserId });
+      log('📴 Emitted end_call');
       cleanup();
     }
 
     function cancelCall() {
+      if (!currentCallId || !isCaller || callStatus !== 'RINGING') return log('⚠️ Cannot cancel now');
       socket.emit('cancel_call', { callId: currentCallId, userId: myUserId });
+      log('📵 Emitted cancel_call');
       cleanup();
     }
 
     async function startLocalPreview() {
       const localVideoEl = document.getElementById('localVideo');
       const constraints = callType === 'VIDEO' ? { audio: true, video: true } : { audio: true };
+      log(`[DEBUG] startLocalPreview with constraints: ${JSON.stringify(constraints)}`);
       try {
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
-        log('🎥 Got local stream: ' + localStream.id);
-        localStream.getTracks().forEach(t => log(`🎙️ Track: ${t.kind}`));
         if (callType === 'VIDEO') {
           localVideoEl.srcObject = localStream;
           localVideoEl.style.display = 'block';
@@ -254,25 +270,30 @@
 
     async function startWebRTC(isInitiator) {
       if (peerConnection) return;
+
+      const constraints = callType === 'VIDEO' ? { audio: true, video: true } : { audio: true };
+      if (!localStream) {
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      }
+
       peerConnection = new RTCPeerConnection(iceServers);
-      localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-        log(`➕ Added track: ${track.kind}`);
-      });
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
       const remoteVideoEl = document.getElementById('remoteVideo');
       const remoteAudioEl = document.getElementById('remoteAudio');
 
       peerConnection.ontrack = (event) => {
         const stream = event.streams[0];
+        if (callType === 'VIDEO') {
+          remoteVideoEl.srcObject = stream;
+          remoteVideoEl.style.display = 'block';
+        }
         remoteAudioEl.srcObject = stream;
-        remoteVideoEl.srcObject = stream;
-        remoteVideoEl.style.display = 'block';
-        log('📡 Remote stream received');
+        log('🔊 Playing remote media');
       };
 
       peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
+        if (event.candidate && otherUserId) {
           socket.emit('ice_candidate', {
             from: myUserId,
             to: otherUserId,
