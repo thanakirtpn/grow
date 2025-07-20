@@ -12,90 +12,97 @@ const ChatSidebar = ({ onSelectChat }) => {
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const fetchData = async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) return navigate('/login');
+const fetchData = async () => {
+  const token = localStorage.getItem('authToken');
+  if (!token) return navigate('/login');
 
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      'ngrok-skip-browser-warning': 'true',
-    };
-
-    try {
-      const resInbox = await fetch(`${API_BASE_URL}/api/talk/chats`, { headers });
-      if (resInbox.status === 401) return navigate('/login');
-      const dataInbox = await resInbox.json();
-      const formattedInbox = (dataInbox?.chats || []).map(chat => {
-        const avatar =
-          chat.avatar && chat.avatar !== 'null' && chat.avatar !== 'undefined'
-            ? new URL(chat.avatar, API_BASE_URL).href
-            : null;
-
-        return {
-          id: chat.userId,
-          name: chat.username,
-          avatar,
-          message: chat.lastMessage,
-          time: new Date(chat.lastMessageTime).toISOString(),
-          unread: 0,
-          online: true,
-          status: chat.status,
-        };
-      });
-
-      const resRequest = await fetch(`${API_BASE_URL}/api/talk/requests`, { headers });
-      if (resRequest.status === 401) return navigate('/login');
-      const dataRequest = await resRequest.json();
-      const senderMap = new Map();
-      (dataRequest?.requests || []).forEach((r) => {
-        const existing = senderMap.get(r.senderId);
-        if (!existing) {
-          senderMap.set(r.senderId, {
-            senderId: r.senderId,
-            senderUsername: r.senderUsername,
-            senderAvatar: r.senderAvatar || null,
-            message: r.message,
-            created_at: r.created_at,
-            status: r.status,
-            count: 1,
-          });
-        } else {
-          existing.count += 1;
-          if (new Date(r.created_at) > new Date(existing.created_at)) {
-            existing.message = r.message;
-            existing.created_at = r.created_at;
-          }
-        }
-      });
-
-      const formattedRequest = [];
-      senderMap.forEach((r) => {
-        const avatar =
-          r.senderAvatar && r.senderAvatar !== 'null' && r.senderAvatar !== 'undefined'
-            ? new URL(r.senderAvatar, API_BASE_URL).href
-            : null;
-
-        formattedRequest.push({
-          id: r.senderId,
-          name: r.senderUsername,
-          avatar,
-          message: r.message,
-          time: new Date(r.created_at).toISOString(),
-          unread: r.count,
-          online: true,
-          status: r.status,
-        });
-      });
-
-      setChatData(prev => ({
-        ...prev,
-        inbox: formattedInbox,
-        request: formattedRequest,
-      }));
-    } catch (err) {
-      console.error('Error fetching chats:', err);
-    }
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'ngrok-skip-browser-warning': 'true',
   };
+
+  try {
+    const baseURL = API_BASE_URL.replace(/\/$/, ''); // ตัด '/' ท้ายสุด
+
+    const resInbox = await fetch(`${API_BASE_URL}/api/talk/chats`, { headers });
+    if (resInbox.status === 401) return navigate('/login');
+    const dataInbox = await resInbox.json();
+
+    const formattedInbox = (dataInbox?.chats || []).map(chat => {
+      const avatar =
+        chat.avatar &&
+        chat.avatar !== 'null' &&
+        chat.avatar !== 'undefined'
+          ? `${baseURL}${chat.avatar.startsWith('/') ? '' : '/'}${chat.avatar}`
+          : null;
+
+      return {
+        id: chat.userId,
+        name: chat.username,
+        avatar,
+        message: chat.lastMessage,
+        time: new Date(chat.lastMessageTime).toISOString(),
+        unread: 0,
+        online: true,
+        status: chat.status,
+      };
+    });
+
+    const resRequest = await fetch(`${API_BASE_URL}/api/talk/requests`, { headers });
+    if (resRequest.status === 401) return navigate('/login');
+    const dataRequest = await resRequest.json();
+    const senderMap = new Map();
+    (dataRequest?.requests || []).forEach((r) => {
+      const existing = senderMap.get(r.senderId);
+      if (!existing) {
+        senderMap.set(r.senderId, {
+          senderId: r.senderId,
+          senderUsername: r.senderUsername,
+          senderAvatar: r.senderAvatar || null,
+          message: r.message,
+          created_at: r.created_at,
+          status: r.status,
+          count: 1,
+        });
+      } else {
+        existing.count += 1;
+        if (new Date(r.created_at) > new Date(existing.created_at)) {
+          existing.message = r.message;
+          existing.created_at = r.created_at;
+        }
+      }
+    });
+
+    const formattedRequest = [];
+    senderMap.forEach((r) => {
+      const avatar =
+        r.senderAvatar &&
+        r.senderAvatar !== 'null' &&
+        r.senderAvatar !== 'undefined'
+          ? `${baseURL}${r.senderAvatar.startsWith('/') ? '' : '/'}${r.senderAvatar}`
+          : null;
+
+      formattedRequest.push({
+        id: r.senderId,
+        name: r.senderUsername,
+        avatar,
+        message: r.message,
+        time: new Date(r.created_at).toISOString(),
+        unread: r.count,
+        online: true,
+        status: r.status,
+      });
+    });
+
+    setChatData(prev => ({
+      ...prev,
+      inbox: formattedInbox,
+      request: formattedRequest,
+    }));
+  } catch (err) {
+    console.error('Error fetching chats:', err);
+  }
+};
 
   useEffect(() => {
     fetchData();
