@@ -12,6 +12,12 @@ const ChatSidebar = ({ onSelectChat }) => {
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+  const getAvatarUrl = (avatarPath) => {
+    if (!avatarPath || avatarPath === 'null' || avatarPath === 'undefined') return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    return `${API_BASE_URL.replace(/\/$/, '')}/${avatarPath.replace(/^\//, '')}`;
+  };
+
   const fetchData = async () => {
     const token = localStorage.getItem('authToken');
     if (!token) return navigate('/login');
@@ -26,11 +32,7 @@ const ChatSidebar = ({ onSelectChat }) => {
       if (resInbox.status === 401) return navigate('/login');
       const dataInbox = await resInbox.json();
       const formattedInbox = (dataInbox?.chats || []).map(chat => {
-        const avatar =
-          chat.avatar && chat.avatar !== 'null' && chat.avatar !== 'undefined'
-            ? new URL(chat.avatar, API_BASE_URL).href
-            : null;
-
+        const avatar = getAvatarUrl(chat.avatar);
         return {
           id: chat.userId,
           name: chat.username,
@@ -70,11 +72,7 @@ const ChatSidebar = ({ onSelectChat }) => {
 
       const formattedRequest = [];
       senderMap.forEach((r) => {
-        const avatar =
-          r.senderAvatar && r.senderAvatar !== 'null' && r.senderAvatar !== 'undefined'
-            ? new URL(r.senderAvatar, API_BASE_URL).href
-            : null;
-
+        const avatar = getAvatarUrl(r.senderAvatar);
         formattedRequest.push({
           id: r.senderId,
           name: r.senderUsername,
@@ -182,7 +180,12 @@ const ChatSidebar = ({ onSelectChat }) => {
                   }}
                 >
                   <div className="relative w-10 h-10 flex-shrink-0">
-                    <img src={avatarSrc} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                    <img
+                      src={avatarSrc}
+                      alt="Avatar"
+                      onError={(e) => (e.currentTarget.src = defaultAvatar)}
+                      className="w-full h-full rounded-full object-cover"
+                    />
                     {chat.online && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                     )}
