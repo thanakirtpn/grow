@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Socket.IO Audio Call Test</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f8f8f8;
+    }
+    #log {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      height: 300px;
+      overflow-y: scroll;
+      margin-top: 1rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    input, button {
+      margin: 0.25rem;
+      padding: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>📡 Socket.IO Audio Call Test</h1>
+
+  <div>
+    <label><b>Your User ID:</b></label>
+    <input type="number" id="userId" value="1" />
+    <button onclick="connectSocket()">Connect</button>
+  </div>
+
+  <div>
+    <label><b>Receiver ID:</b></label>
+    <input type="number" id="receiverId" value="2" />
+    <input type="text" id="message" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send Message</button>
+  </div>
+
+  <div>
+    <button onclick="startCall('VOICE')">📞 Start Call</button>
+    <button onclick="acceptCall()">✅ Accept</button>
+    <button onclick="declineCall()">❌ Decline</button>
+    <button onclick="endCall()">📴 End</button>
+    <button onclick="cancelCall()">📵 Cancel</button>
+  </div>
+
+  <audio id="remoteAudio" autoplay></audio>
+  <div id="log"></div>
+
+  <script>
+    let socket;
+    let currentCallId = null;
+    let isCaller = false;
+    let callStatus = null;
+    let localStream = null;
+    let peerConnection = null;
+    let myUserId = null;
+    let otherUserId = null;
+    const iceQueue = [];
+
+    const iceServers = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+    function log(msg) {
+      const logArea = document.getElementById('log');
+      logArea.textContent += msg + '\n\n';
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    function connectSocket() {
+      myUserId = Number(document.getElementById('userId').value);
+      socket = io('https://0b02e4248cf5.ngrok-free.app', {
+        query: { userId: myUserId },
+        transports: ['websocket'],
+      });
+
+      socket.on('connect', () => log(`✅ Connected as user ${myUserId}`));
+      socket.on('disconnect', () => log(`❌ Disconnected`));
+      socket.on('receive_message', (msg) => log(`📩 Message received: ${JSON.stringify(msg)}`));
+      socket.on('message_sent', (msg) => log(`📤 Message sent: ${JSON.stringify(msg)}`));
+
+      socket.on('incoming_call', (call) => {
+        log(`📞 Incoming call: ${JSON.stringify(call)}`);
+        currentCallId = call.callId;
+        otherUserId = call.from;
+        isCaller = false;
+        callStatus = 'RINGING';
+      });
+
+      socket.on('call_started', ({ callId }) => {
+        currentCallId = callId;
+        otherUserId = Number(document.getElementById('receiverId').value);
+        isCaller = true;
+        callStatus = 'RINGING';
+        log(`📞 Call started with ID ${callId}`);
+      });
+
+      socket.on('call_accepted', async (data) => {
+        log(`✅ Call accepted: ${JSON.stringify(data)}`);
+        callStatus = 'ONGOING';
+        if (isCaller) await startWebRTC(true);
+      });
+
+      socket.on('call_declined', () => {
+        log(`❌ Call declined`);
+        cleanup();
+      });
+
+      socket.on('call_ended', () => {
+        log(`📴 Call ended`);
+        cleanup();
+      });
+
+      socket.on('call_canceled', () => {
+        log(`📵 Call canceled`);
+        cleanup();
+      });
+
+      socket.on('webrtc_offer', async (data) => {
+        log('📨 Received WebRTC offer');
+        otherUserId = data.from;
+        await startWebRTC(false);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit('webrtc_answer', { from: myUserId, to: otherUserId, sdp: answer });
+        log('📤 Sent webrtc_answer');
+
+        // Flush ICE ที่ค้างไว้
+        while (iceQueue.length) {
+          const candidate = iceQueue.shift();
+          try {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            log('✅ Flushed ICE candidate');
+          } catch (err) {
+            log('⚠️ Error flushing ICE: ' + err);
+          }
+        }
+      });
+
+      socket.on('webrtc_answer', async (data) => {
+        log('📨 Received WebRTC answer');
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+      });
+
+      socket.on('ice_candidate', async (data) => {
+        log('❄️ Received ICE candidate');
+        if (!peerConnection || !peerConnection.remoteDescription || peerConnection.remoteDescription.type === '') {
+          iceQueue.push(data.candidate);
+          log('🕒 Queued ICE candidate');
+          return;
+        }
+
+        try {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+          log('✅ ICE candidate added');
+        } catch (err) {
+          log('⚠️ Error adding ICE candidate: ' + err);
+        }
+      });
+    }
+
+    function sendMessage() {
+      if (!socket || !socket.connected) return log('⚠️ Not connected');
+      const senderId = myUserId;
+      const receiverId = Number(document.getElementById('receiverId').value);
+      const content = document.getElementById('message').value;
+      socket.emit('send_message', { senderId, receiverId, content });
+      log(`➡️ Emitted send_message`);
+    }
+
+    function startCall(type) {
+      if (!socket || !socket.connected) return log('⚠️ Not connected');
+      const callerId = myUserId;
+      const receiverId = Number(document.getElementById('receiverId').value);
+      socket.emit('start_call', { callerId, receiverId, type });
+      log('📞 Emitted start_call');
+    }
+
+    function acceptCall() {
+      if (!currentCallId) return log('⚠️ No call to accept');
+      socket.emit('accept_call', { callId: currentCallId, receiverId: myUserId });
+      log('✅ Emitted accept_call');
+      callStatus = 'ONGOING';
+    }
+
+    function declineCall() {
+      if (!currentCallId) return log('⚠️ No call to decline');
+      socket.emit('decline_call', { callId: currentCallId, receiverId: myUserId });
+      log('❌ Emitted decline_call');
+      cleanup();
+    }
+
+    function endCall() {
+      if (!currentCallId || callStatus !== 'ONGOING') return log('⚠️ No active call to end');
+      socket.emit('end_call', { callId: currentCallId, userId: myUserId });
+      log('📴 Emitted end_call');
+      cleanup();
+    }
+
+    function cancelCall() {
+      if (!currentCallId || !isCaller || callStatus !== 'RINGING') return log('⚠️ Cannot cancel now');
+      socket.emit('cancel_call', { callId: currentCallId, userId: myUserId });
+      log('📵 Emitted cancel_call');
+      cleanup();
+    }
+
+    async function startWebRTC(isInitiator) {
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      peerConnection = new RTCPeerConnection(iceServers);
+
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+      peerConnection.ontrack = (event) => {
+        document.getElementById('remoteAudio').srcObject = event.streams[0];
+        log('🔊 Playing remote audio');
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate && otherUserId) {
+          socket.emit('ice_candidate', {
+            from: myUserId,
+            to: otherUserId,
+            candidate: event.candidate
+          });
+          log('📤 Sent ICE candidate');
+        }
+      };
+
+      if (isInitiator) {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit('webrtc_offer', {
+          from: myUserId,
+          to: otherUserId,
+          sdp: offer
+        });
+        log('📤 Sent webrtc_offer');
+      }
+    }
+
+    function cleanup() {
+      currentCallId = null;
+      callStatus = null;
+      isCaller = false;
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+    }
+  </script>
+</body>
+</html>
