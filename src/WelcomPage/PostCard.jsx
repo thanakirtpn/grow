@@ -12,8 +12,10 @@ function PostCard({ post }) {
 
   const fetchImage = async (url) => {
     const token = localStorage.getItem('authToken');
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const fullUrl = `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     try {
-      const response = await fetch(url, {
+      const response = await fetch(fullUrl, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'ngrok-skip-browser-warning': 'true',
@@ -31,7 +33,15 @@ function PostCard({ post }) {
   useEffect(() => {
     const loadImages = async () => {
       if (post.images?.length > 0 && post.images[0]?.image_url && !imageError) {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         const url = `https://0b02e4248cf5.ngrok-free.app${post.images[0].image_url.startsWith('/') ? '' : '/'}${post.images[0].image_url}`;
+=======
+        const url = post.images[0].image_url;
+>>>>>>> Stashed changes
+=======
+        const url = post.images[0].image_url;
+>>>>>>> Stashed changes
         const src = await fetchImage(url);
         setImageSrc(src || defaultImage);
       } else {
@@ -39,7 +49,15 @@ function PostCard({ post }) {
       }
 
       if (post.user?.profile_picture && !profileError) {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         const url = `https://0b02e4248cf5.ngrok-free.app${post.user.profile_picture.startsWith('/') ? '' : '/'}${post.user.profile_picture}`;
+=======
+        const url = post.user.profile_picture;
+>>>>>>> Stashed changes
+=======
+        const url = post.user.profile_picture;
+>>>>>>> Stashed changes
         const src = await fetchImage(url);
         setProfileSrc(src || defaultProfile);
       } else {

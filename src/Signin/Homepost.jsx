@@ -6,7 +6,15 @@ import myImageS from '../assets/Setup.png';
 import myImageL from '../assets/Left2.png';
 import myImageR from '../assets/Right.png';
 import Post from './Post';
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import Header from '../components/header';
+=======
+import PostModal from './PostModel';
+>>>>>>> Stashed changes
+=======
+import PostModal from './PostModel';
+>>>>>>> Stashed changes
 
 const Homepost = () => {
   const [posts, setPosts] = useState([]);
@@ -25,11 +33,28 @@ const Homepost = () => {
   const [postText, setPostText] = useState('');
   const [postTitle, setPostTitle] = useState('');
   const [category, setCategory] = useState('');
-  const [profileImageUrl, setProfileImageUrl] = useState(null); // แยก state สำหรับรูปโปรไฟล์
-  const [postImagePreview, setPostImagePreview] = useState(null); // สำหรับรูปที่อัปโหลดใน modal
-  const [postImageFile, setPostImageFile] = useState(null); // สำหรับไฟล์ภาพที่อัปโหลด
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const [postImagePreview, setPostImagePreview] = useState(null);
+  const [postImageFile, setPostImageFile] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [userName, setUserName] = useState('User');
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    console.log('Auth Token:', token);
+    if (!token) {
+      console.warn('No auth token found');
+      return {
+        'Accept': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+    }
+    return {
+      'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      'Authorization': `Bearer ${token}`,
+    };
+  };
 
   const getCategoryIcon = (categoryName) => {
     const emojis = {
@@ -53,11 +78,24 @@ const Homepost = () => {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         const response = await fetch('https://0b02e4248cf5.ngrok-free.app/moment/categories', {
           headers: { Accept: 'application/json', 'ngrok-skip-browser-warning': 'true' },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+=======
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://0b02e4248cf5.ngrok-free.app';
+        const response = await fetch(`${API_BASE_URL}/moment/categories`, { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+>>>>>>> Stashed changes
+=======
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://0b02e4248cf5.ngrok-free.app';
+        const response = await fetch(`${API_BASE_URL}/moment/categories`, { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+>>>>>>> Stashed changes
         const data = await response.json();
+        console.log('Categories API Response:', JSON.stringify(data, null, 2));
         const apiCategories = data.map((category) => ({
           id: category.id,
           name: category.name,
@@ -93,38 +131,52 @@ const Homepost = () => {
       const token = localStorage.getItem('authToken');
       if (!token) {
         console.warn('No auth token found, skipping posts fetch');
-        setErrorPosts('No authentication token available');
+        setErrorPosts('ไม่มีโทเคนการยืนยันตัวตน');
         setPosts([]);
         setLoadingPosts(false);
         return;
       }
       try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         let url = 'https://0b02e4248cf5.ngrok-free.app/api/posts';
+=======
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+        let url = `${API_BASE_URL}/api/posts`;
+>>>>>>> Stashed changes
+=======
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+        let url = `${API_BASE_URL}/api/posts`;
+>>>>>>> Stashed changes
         if (selectedCategoryId !== null) {
           url += `?categoryId=${selectedCategoryId}`;
         }
-        const headers = {
-          Accept: 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-          Authorization: `Bearer ${token}`,
-        };
-        const response = await fetch(url, { headers });
+        const response = await fetch(url, { headers: getAuthHeaders() });
         if (!response.ok) {
           if (response.status === 401) {
             console.error('Unauthorized: Invalid or expired token');
-            alert('Please log in again');
+            alert('กรุณาล็อกอินใหม่');
             localStorage.removeItem('authToken');
             window.location.href = '/login';
             return;
           }
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log('Fetched posts:', data);
-        setPosts(data);
+        console.log('Posts API Response:', JSON.stringify(data, null, 2)); // Debug
+        // แปลง image_url ให้เป็น full URL
+        const formattedPosts = data.map((post) => ({
+          ...post,
+          image_url: post.image_url
+            ? post.image_url.startsWith('http')
+              ? post.image_url
+              : `${API_BASE_URL}${post.image_url.startsWith('/') ? '' : '/'}${post.image_url}`
+            : null,
+        }));
+        setPosts(formattedPosts);
       } catch (err) {
         console.error('Fetch Posts Error:', err.message);
-        setErrorPosts(err.message || 'Failed to fetch posts');
+        setErrorPosts(err.message || 'ไม่สามารถดึงโพสต์ได้');
         setPosts([]);
       } finally {
         setLoadingPosts(false);
@@ -133,16 +185,48 @@ const Homepost = () => {
     fetchPosts();
   }, [selectedCategoryId]);
 
-  useEffect(() => {
-    const fetchProfileImage = async () => {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        console.warn('No auth token found, skipping profile fetch');
+ useEffect(() => {
+  const fetchProfileImage = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.warn('No auth token found, skipping profile fetch');
+      setProfileImageUrl(null);
+      setUserName('User');
+      setLoadingImage(false);
+      return;
+    }
+    setLoadingImage(true);
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+    };
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const profileResponse = await fetch(`${API_BASE_URL}/api/profile/me`, { headers });
+      if (!profileResponse.ok) {
+        throw new Error(`HTTP error! Status: ${profileResponse.status}`);
+      }
+      const profileData = await profileResponse.json();
+      console.log('Profile Data:', profileData);
+
+      const name = profileData.name || profileData.username || profileData.display_name || 'User';
+      setUserName(name);
+
+      let profileImageUrl = null;
+      if (profileData.profileImage) {
+        profileImageUrl = `${API_BASE_URL}${profileData.profileImage.startsWith('/') ? '' : '/'}${profileData.profileImage}`;
+      } else if (profileData.profile_picture) {
+        profileImageUrl = `${API_BASE_URL}${profileData.profile_picture.startsWith('/') ? '' : '/'}${profileData.profile_picture}`;
+      } else if (profileData.profilePicture) {
+        profileImageUrl = `${API_BASE_URL}${profileData.profilePicture.startsWith('/') ? '' : '/'}${profileData.profilePicture}`;
+      } else {
+        console.log('No profile image found in profileData, using default');
         setProfileImageUrl(null);
-        setUserName('User');
-        setLoadingImage(false);
         return;
       }
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       setLoadingImage(true);
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -170,37 +254,45 @@ const Homepost = () => {
           profileImage = `https://0b02e4248cf5.ngrok-free.app${profileData.profile_picture.startsWith('/') ? '' : '/'}${profileData.profile_picture}`;
         } else if (posts.length > 0 && posts[0]?.user?.profile_picture) {
           profileImage = `https://0b02e4248cf5.ngrok-free.app${posts[0].user.profile_picture.startsWith('/') ? '' : '/'}${posts[0].user.profile_picture}`;
-        }
+=======
 
-        if (profileImage) {
-          const imageResponse = await fetch(profileImage, { headers });
-          if (!imageResponse.ok) {
-            console.error(`Image fetch error: Status ${imageResponse.status}, URL: ${profileImage}`);
-            throw new Error(`Image fetch failed with status ${imageResponse.status}`);
-          }
-          const imageBlob = await imageResponse.blob();
-          const imageObjectUrl = URL.createObjectURL(imageBlob);
-          setProfileImageUrl(imageObjectUrl);
-        } else {
-          console.warn('No profile image found in profileData or localStorage');
-          setProfileImageUrl(null);
+=======
+
+>>>>>>> Stashed changes
+      if (profileImageUrl) {
+        const imageResponse = await fetch(profileImageUrl, { headers });
+        if (!imageResponse.ok) {
+          console.error(`Image fetch error: Status ${imageResponse.status}, URL: ${profileImageUrl}`);
+          throw new Error(`Image fetch failed with status ${imageResponse.status}`);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         }
-      } catch (error) {
-        console.error('Error fetching profile:', error.message);
+        const imageBlob = await imageResponse.blob();
+        const imageObjectUrl = URL.createObjectURL(imageBlob);
+        setProfileImageUrl(imageObjectUrl);
+        localStorage.setItem('profilePictureUrl', imageObjectUrl);
+      } else {
+        console.warn('No valid profile image URL found');
         setProfileImageUrl(null);
-        setUserName('User');
-      } finally {
-        setLoadingImage(false);
       }
-    };
-    fetchProfileImage();
+    } catch (error) {
+      console.error('Error fetching profile:', error.message);
+      setProfileImageUrl(null);
+      setUserName('User');
+    } finally {
+      setLoadingImage(false);
+    }
+  };
+  fetchProfileImage();
 
-    return () => {
-      if (profileImageUrl && profileImageUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(profileImageUrl);
-      }
-    };
-  }, [posts]);
+  return () => {
+    if (profileImageUrl && profileImageUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(profileImageUrl);
+    }
+  };
+}, [posts]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -221,52 +313,38 @@ const Homepost = () => {
     }
   };
 
-  const handlePostSubmit = async (e) => {
-    e.preventDefault();
+  const handlePostSubmit = async (formData, submittedTitle, submittedText, submittedCategory, submittedImageFile) => {
     const token = localStorage.getItem('authToken');
     if (!token) {
       console.warn('No auth token found, cannot submit post');
-      alert('Please log in to create a post!');
+      alert('กรุณาล็อกอินเพื่อสร้างโพสต์!');
       return;
-    }
-    if (!postTitle || !postText) {
-      alert('กรุณากรอกหัวข้อและเนื้อหาโพสต์');
-      return;
-    }
-    if (!category) {
-      alert('กรุณาเลือกหมวดหมู่');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('title', postTitle);
-    formData.append('text', postText);
-    const selectedCat = categories.find((cat) => cat.name.toLowerCase() === category);
-    if (selectedCat && selectedCat.id !== null) {
-      formData.append('categoryId', selectedCat.id);
-    } else {
-      alert('หมวดหมู่ไม่ถูกต้องหรือเลือก "All" ซึ่งไม่สามารถใช้ได้');
-      return;
-    }
-    if (postImageFile) {
-      formData.append('image', postImageFile);
-    }
-
-    console.log('FormData contents:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
     }
 
     try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch('https://0b02e4248cf5.ngrok-free.app/api/posts', {
+=======
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+      console.log('Posting to:', `${API_BASE_URL}/api/posts`);
+      const response = await fetch(`${API_BASE_URL}/api/posts`, {
+>>>>>>> Stashed changes
+=======
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+      console.log('Posting to:', `${API_BASE_URL}/api/posts`);
+      const response = await fetch(`${API_BASE_URL}/api/posts`, {
+>>>>>>> Stashed changes
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
           'ngrok-skip-browser-warning': 'true',
         },
         body: formData,
       });
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       if (response.ok) {
         const newPost = await response.json();
         setPosts([
@@ -293,10 +371,50 @@ const Homepost = () => {
         const errorData = await response.json();
         console.error('Post creation failed:', JSON.stringify(errorData, null, 2));
         alert(`ไม่สามารถสร้างโพสต์ได้: ${errorData.message || 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์'}`);
+=======
+=======
+>>>>>>> Stashed changes
+      console.log('Post Response Status:', response.status, response.statusText);
+      if (!response.ok) {
+        let errorMessage = `HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          console.error('Post creation error details:', JSON.stringify(errorData, null, 2));
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error('Failed to parse error response:', e);
+        }
+        throw new Error(errorMessage);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       }
+
+      const newPost = await response.json();
+      console.log('New Post Response:', JSON.stringify(newPost, null, 2));
+
+      const newPostForState = {
+        id: newPost.id,
+        title: newPost.text || submittedTitle,
+        text: newPost.text || submittedText,
+        category: categories.find((cat) => cat.id === newPost.categoryId) || { name: submittedCategory },
+        images: newPost.images
+          ? newPost.images.startsWith('http')
+            ? newPost.images
+            : `${API_BASE_URL}${newPost.images.startsWith('/') ? '' : '/'}${newPost.images}`
+          : null,
+        user: {
+          name: userName,
+          profile_picture: profileImageUrl,
+        },
+      };
+
+      setPosts([newPostForState, ...posts]);
+      alert('โพสต์สำเร็จ!');
     } catch (error) {
       console.error('Error posting:', error.message);
-      alert('เกิดข้อผิดพลาดขณะโพสต์: ' + error.message);
+      throw error;
     }
   };
 
@@ -343,6 +461,7 @@ const Homepost = () => {
     setTouchStart(null);
   };
 
+  // JSX เดิมจากโค้ดชุดที่สอง (รวม PostModal)
   return (
     <div className="bg-white min-h-screen">
       {/* <nav className="bg-white p-4 sm:p-6 md:p-8">
@@ -567,111 +686,27 @@ const Homepost = () => {
             </div>
           )}
           {showPostModal && (
-            <div className="fixed inset-0 bg-opacity-30 bg-[#4A4A4A4D] flex items-center justify-center z-50">
-              <div className="bg-white rounded-3xl p-6 w-full max-w-2xl relative">
-                <button
-                  className="absolute no-style top-4 right-4 text-gray-500 hover:text-gray-700"
-                  onClick={() => {
-                    setShowPostModal(false);
-                    setPostImageFile(null);
-                    setPostImagePreview(null);
-                  }}
-                >
-                  ✕
-                </button>
-                <div className="flex items-center mb-8">
-                  <div className="w-13 h-13 mr-2 border-4 border-[#FF6250] rounded-full flex items-center justify-center">
-                    {loadingImage ? (
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <span>Loading...</span>
-                      </div>
-                    ) : profileImageUrl ? (
-                      <img
-                        src={profileImageUrl}
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full ml-1 mr-1"
-                        onError={(e) => {
-                          console.error('Profile image load error:', e);
-                          setProfileImageUrl(myImageG);
-                        }}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                        <span>No Image</span>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="font-medium text-[20px] poppins-font text-[#333333]">{userName}</h3>
-                </div>
-                <div className="w-full mb-6 rounded-2xl overflow-hidden bg-[#F3F3F3] border border-[#E8E8EA]">
-                  <div className="px-4 py-4">
-                    <input
-                      type="text"
-                      value={postTitle}
-                      onChange={(e) => setPostTitle(e.target.value)}
-                      placeholder="Post title"
-                      className="w-full bg-transparent outline-none text-[#333333] text-base font-semibold poppins-font"
-                    />
-                  </div>
-                  <hr className="border-t-2 border-[#E8E8EA] mx-4" />
-                  <div className="px-4 py-4">
-                    <textarea
-                      className="w-full h-48 p-2 bg-[#F3F3F3] rounded-none border-0 text-base font-normal poppins-font focus:outline-none focus:ring-2 focus:ring-[#C53678]"
-                      placeholder="Write something..."
-                      value={postText}
-                      onChange={(e) => setPostText(e.target.value)}
-                    />
-                  </div>
-                  {postImagePreview && postImageFile && (
-                    <div className="px-4 py-4">
-                      <img
-                        src={postImagePreview}
-                        alt="Post Preview"
-                        className="max-w-full h-auto rounded-lg"
-                        onError={(e) => console.error('Post preview image load error:', e)}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="flex space-x-4 mb-4">
-                  <button
-                    type="button"
-                    className="add-media-button no-style px-2 py-2 bg-[#FEF4F4] text-[#333333] text-[14px] font-normal rounded-lg flex items-center poppins-font"
-                    onClick={() => document.getElementById('modalFileInput').click()}
-                  >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add media
-                  </button>
-                  <input
-                    type="file"
-                    id="modalFileInput"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="px-2 py-2 bg-[#FEF4F4] text-[#333333] rounded-lg poppins-font text-[14px] font-normal w-1/4 pr-8 relative"
-                  >
-                    <option value="">Add Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.name.toLowerCase()}>{cat.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <hr className="border-t-2 border-[#F3F3F3] mx-1 my-4" />
-                <button
-                  type="submit"
-                  className="px-16 py-2 ml-auto bg-[#C53678] text-white rounded-3xl font-medium poppins-font text-base"
-                  onClick={handlePostSubmit}
-                >
-                  Post
-                </button>
-              </div>
-            </div>
+            <PostModal
+              show={showPostModal}
+              onClose={() => {
+                setShowPostModal(false);
+                setPostImageFile(null);
+                setPostImagePreview(null);
+              }}
+              userName={userName}
+              profileImageUrl={profileImageUrl}
+              loadingImage={loadingImage}
+              categories={categories}
+              onPostSubmit={handlePostSubmit}
+              postTitle={postTitle}
+              setPostTitle={setPostTitle}
+              postText={postText}
+              setPostText={setPostText}
+              postImagePreview={postImagePreview}
+              setPostImagePreview={setPostImagePreview}
+              postImageFile={postImageFile}
+              setPostImageFile={setPostImageFile}
+            />
           )}
           {!loadingCategories && !errorCategories && categories.length === 0 && (
             <p className="text-center text-gray-700">No categories available.</p>

@@ -17,7 +17,17 @@ function Login() {
     setError('');
 
     try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch('https://0b02e4248cf5.ngrok-free.app/auth/login/', {
+=======
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+>>>>>>> Stashed changes
+=======
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+>>>>>>> Stashed changes
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

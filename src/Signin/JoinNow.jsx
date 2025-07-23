@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import lanGuage from '../assets/Language.png';
@@ -62,6 +61,8 @@ const JoinNow = () => {
       const fetchCategories = async () => {
         setIsLoadingCategories(true);
         try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
           const response = await fetch(
             'https://0b02e4248cf5.ngrok-free.app/moment/categories',
             {
@@ -69,6 +70,18 @@ const JoinNow = () => {
               headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
             }
           );
+=======
+=======
+>>>>>>> Stashed changes
+          const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+          const response = await fetch(`${API_BASE_URL}/moment/categories`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+          });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
           const contentType = response.headers.get('Content-Type');
           if (!contentType || !contentType.includes('application/json')) {
             throw new Error('Response is not JSON');
@@ -107,6 +120,8 @@ const JoinNow = () => {
       if (!emailRegex.test(email)) {
         throw new Error('Please enter a valid email');
       }
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch(
         'https://0b02e4248cf5.ngrok-free.app/auth/register-step1',
         {
@@ -115,6 +130,19 @@ const JoinNow = () => {
           body: JSON.stringify({ email, password, confirmPassword }),
         }
       );
+=======
+=======
+>>>>>>> Stashed changes
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/register-step1`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, confirmPassword }),
+      });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Failed to send OTP');
@@ -143,6 +171,8 @@ const JoinNow = () => {
     });
     const storedEmail = localStorage.getItem('registerEmail') || email;
     try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch(
         'https://0b02e4248cf5.ngrok-free.app/auth/register-step2',
         {
@@ -151,6 +181,19 @@ const JoinNow = () => {
           body: JSON.stringify({ email: storedEmail, otp }),
         }
       );
+=======
+=======
+>>>>>>> Stashed changes
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/register-step2`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: storedEmail, otp }),
+      });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'OTP verification failed');
@@ -187,6 +230,8 @@ const JoinNow = () => {
 
       console.log('Sending data:', { email: storedEmail, username, aboutMe, dateOfBirth });
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch(
         'https://0b02e4248cf5.ngrok-free.app/auth/register-step3',
         {
@@ -194,6 +239,18 @@ const JoinNow = () => {
           body: formData,
         }
       );
+=======
+=======
+>>>>>>> Stashed changes
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/register-step3`, {
+        method: 'POST',
+        body: formData,
+      });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Failed to submit personal information');
@@ -226,6 +283,8 @@ const JoinNow = () => {
       if (!emailRegex.test(storedEmail)) {
         throw new Error('Invalid email in storage');
       }
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch(
         'https://0b02e4248cf5.ngrok-free.app/auth/resend-otp',
         {
@@ -234,6 +293,19 @@ const JoinNow = () => {
           body: JSON.stringify({ email: storedEmail }),
         }
       );
+=======
+=======
+>>>>>>> Stashed changes
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: storedEmail }),
+      });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Unable to send new OTP');
@@ -262,6 +334,8 @@ const JoinNow = () => {
     const storedEmail = localStorage.getItem('registerEmail') || email;
     try {
       console.log('Sending interests:', interestsToSend);
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const response = await fetch(
         'https://0b02e4248cf5.ngrok-free.app/auth/register-step4',
         {
@@ -270,6 +344,19 @@ const JoinNow = () => {
           body: JSON.stringify({ email: storedEmail, interests: interestsToSend }),
         }
       );
+=======
+=======
+>>>>>>> Stashed changes
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/auth/register-step4`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: storedEmail, interests: interestsToSend }),
+      });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Failed to generate token');
@@ -313,7 +400,7 @@ const JoinNow = () => {
         return;
       }
       if (password !== confirmPassword) {
-        setErrors({ ...errors, confirmPassword商家: 'Passwords do not match' });
+        setErrors({ ...errors, confirmPassword: 'Passwords do not match' });
         return;
       }
       sendOtp();

@@ -81,7 +81,6 @@ const getVisibleDotIndex = () => {
     }
   };
 
-  // Auto-scroll ทุก 3 วินาที
   useEffect(() => {
     const interval = setInterval(() => {
       const nextIndex = (currentIndex + 1) % categories.length;
@@ -90,7 +89,6 @@ const getVisibleDotIndex = () => {
     return () => clearInterval(interval);
   }, [currentIndex, categories.length]);
 
-  // ลากด้วยเมาส์
   const handleMouseDown = (e) => {
     if (carouselRef.current) {
       isDragging.current = true;

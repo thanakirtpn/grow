@@ -19,6 +19,12 @@ function Find() {
   const [touchStart, setTouchStart] = useState(null);
   const [isMomentActive, setIsMomentActive] = useState(false);
 
+  const headers = {
+    'Accept': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+    ...(import.meta.env.VITE_API_KEY && { 'Authorization': `Bearer ${import.meta.env.VITE_API_KEY}` }),
+  };
+
   const getCategoryIcon = (categoryName) => {
     const emojis = {
       'All': '📚',
@@ -41,11 +47,24 @@ function Find() {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         const response = await fetch('https://0b02e4248cf5.ngrok-free.app/moment/categories', {
           headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
+=======
+=======
+>>>>>>> Stashed changes
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const resInbox = await fetch(`${API_BASE_URL}/moment/categories`, { headers });
+        if (!resInbox.ok) throw new Error(`HTTP error! Status: ${resInbox.status}`);
+        const data = await resInbox.json();
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         console.log('Categories API Response:', data);
 
         const apiCategories = data.map(category => ({
@@ -81,6 +100,8 @@ function Find() {
   }, []);
 
   useEffect(() => {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     const fetchPosts = async () => {
       setLoadingPosts(true);
       setErrorPosts(null);
@@ -105,11 +126,43 @@ function Find() {
         setPosts([]);
       } finally {
         setLoadingPosts(false);
+=======
+=======
+>>>>>>> Stashed changes
+  const fetchPosts = async () => {
+    setLoadingPosts(true);
+    setErrorPosts(null);
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      let url = `${API_BASE_URL}/moment`;
+      if (selectedCategoryId && selectedCategoryId !== 'all') {
+        url += `?categoryId=${selectedCategoryId}`;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       }
-    };
+      const response = await fetch(url, {
+        headers: { 
+          'Accept': 'application/json',
+          'ngrok-skip-browser-warning': 'true' 
+        },
+      });
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      const data = await response.json();
+      console.log('Posts API Response:', data);
+      setPosts(data);
+    } catch (err) {
+      console.error('Fetch Posts Error:', err);
+      setErrorPosts(err.message || 'Failed to fetch posts');
+      setPosts([]);
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
 
-    fetchPosts();
-  }, [selectedCategoryId]);
+  fetchPosts();
+}, [selectedCategoryId]);
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategoryId(categoryId);
