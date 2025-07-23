@@ -90,7 +90,7 @@ const Homepost = () => {
         setCategories([{ id: null, name: 'All', path: '/all', icon: getCategoryIcon('All') }, ...apiCategories]);
       } catch (err) {
         setErrorCategories(err.message || 'Failed to fetch categories');
-        setCategories([]); // Avoid hardcoded fallback to prevent ID mismatches
+        setCategories([]);
       } finally {
         setLoadingCategories(false);
       }
@@ -100,7 +100,7 @@ const Homepost = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      if (!categories.length && selectedCategoryId !== null) return; // Wait for categories if filtering
+      if (!categories.length && selectedCategoryId !== null) return;
       setLoadingPosts(true);
       setErrorPosts(null);
       const token = localStorage.getItem('authToken');
@@ -258,7 +258,6 @@ const Homepost = () => {
   };
 
   const handleFindClick = () => {
-    // Implement find functionality
   };
 
   const handleMomentClick = () => {
@@ -267,11 +266,9 @@ const Homepost = () => {
   };
 
   const handleTalkClick = () => {
-    // Implement talk functionality
   };
 
   const handleProfileClick = () => {
-    // Implement profile functionality
   };
 
   const toggleMenu = () => setIsOpen(!isOpen);

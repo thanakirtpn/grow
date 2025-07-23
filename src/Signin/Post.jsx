@@ -45,7 +45,6 @@ function Post({ post }) {
 
   useEffect(() => {
     const loadImages = async () => {
-      // โหลดรูปภาพโพสต์
       if (post.images?.length > 0 && post.images[0]?.image_url && !imageError) {
         const url = normalizeImageUrl(post.images[0].image_url);
         const src = await fetchImage(url);
@@ -54,7 +53,6 @@ function Post({ post }) {
         setImageSrc(defaultImage);
       }
 
-      // โหลดรูปโปรไฟล์
       if (post.user?.profile_picture && !profileError) {
         const url = normalizeImageUrl(post.user.profile_picture);
         const src = await fetchImage(url);
