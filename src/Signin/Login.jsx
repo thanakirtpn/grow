@@ -12,43 +12,34 @@ function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch('https://0b02e4248cf5.ngrok-free.app/auth/login/', {
-=======
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
->>>>>>> Stashed changes
-=======
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
->>>>>>> Stashed changes
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-      console.log('Login successful, Token:', data.token);
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('userId', data.user.id); // ✅ จำเป็นมาก เพื่อให้ ChatSidebar และ ChatWindow ทำงานได้ เรื่อง bubble
-      if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
-      }
-      navigate('/Homepost');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  try {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app'; // สอดคล้องกับ Homepost.jsx
+    const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
     }
-  };
+    console.log('Login successful, Token:', data.token);
+    localStorage.setItem('authToken', data.token);
+    localStorage.setItem('userId', data.user.id); // ✅ จำเป็นมาก เพื่อให้ ChatSidebar และ ChatWindow ทำงานได้ เรื่อง bubble
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', email);
+    }
+    navigate('/Homepost');
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="relative min-h-screen login-container bg-white">

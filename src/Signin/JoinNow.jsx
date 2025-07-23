@@ -57,322 +57,222 @@ const JoinNow = () => {
   }, []);
 
   useEffect(() => {
-    if (step === 4) {
-      const fetchCategories = async () => {
-        setIsLoadingCategories(true);
-        try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-          const response = await fetch(
-            'https://0b02e4248cf5.ngrok-free.app/moment/categories',
-            {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-            }
-          );
-=======
-=======
->>>>>>> Stashed changes
-          const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-          const response = await fetch(`${API_BASE_URL}/moment/categories`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-          });
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-          const contentType = response.headers.get('Content-Type');
-          if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Response is not JSON');
-          }
-          const data = await response.json();
-          if (!response.ok) {
-            throw new Error(data.message || 'Failed to fetch categories');
-          }
-          setCategories(data || []);
-        } catch (error) {
-          console.error('Error fetching categories:', error);
-          setErrors({ ...errors, personal: error.message || 'Failed to load categories. Please try again.' });
-          setCategories([]);
-        } finally {
-          setIsLoadingCategories(false);
+  if (step === 4) {
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app'; // สอดคล้องกับ Homepost.jsx
+        const response = await fetch(`${API_BASE_URL}/moment/categories`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        });
+        const contentType = response.headers.get('Content-Type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Response is not JSON');
         }
-      };
-      fetchCategories();
-    }
-  }, [step]);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch categories');
+        }
+        setCategories(data || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setErrors({ ...errors, personal: error.message || 'Failed to load categories. Please try again.' });
+        setCategories([]);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }
+}, [step]);
 
   const sendOtp = async () => {
-    setLoading(true);
-    setErrors({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      otp: '',
-      personal: '',
-      username: '',
-      aboutMe: '',
-      dateOfBirth: '',
-    });
-    try {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        throw new Error('Please enter a valid email');
-      }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch(
-        'https://0b02e4248cf5.ngrok-free.app/auth/register-step1',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, confirmPassword }),
-        }
-      );
-=======
-=======
->>>>>>> Stashed changes
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/register-step1`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, confirmPassword }),
-      });
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to send OTP');
-      }
-      localStorage.setItem('registerEmail', email);
-      console.log('OTP sent successfully');
-      setStep(2);
-    } catch (error) {
-      setErrors({ ...errors, email: error.message });
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setErrors({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    otp: '',
+    personal: '',
+    username: '',
+    aboutMe: '',
+    dateOfBirth: '',
+  });
+  try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Please enter a valid email');
     }
-  };
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+    const response = await fetch(`${API_BASE_URL}/auth/register-step1`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, confirmPassword }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send OTP');
+    }
+    localStorage.setItem('registerEmail', email);
+    console.log('OTP sent successfully');
+    setStep(2);
+  } catch (error) {
+    setErrors({ ...errors, email: error.message });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const verifyOtpAndRegister = async () => {
-    setLoading(true);
-    setErrors({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      otp: '',
-      personal: '',
-      username: '',
-      aboutMe: '',
-      dateOfBirth: '',
+  setLoading(true);
+  setErrors({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    otp: '',
+    personal: '',
+    username: '',
+    aboutMe: '',
+    dateOfBirth: '',
+  });
+  const storedEmail = localStorage.getItem('registerEmail') || email;
+  try {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+    const response = await fetch(`${API_BASE_URL}/auth/register-step2`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: storedEmail, otp }),
     });
-    const storedEmail = localStorage.getItem('registerEmail') || email;
-    try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch(
-        'https://0b02e4248cf5.ngrok-free.app/auth/register-step2',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: storedEmail, otp }),
-        }
-      );
-=======
-=======
->>>>>>> Stashed changes
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/register-step2`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: storedEmail, otp }),
-      });
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'OTP verification failed');
-      }
-      console.log('OTP verification successful');
-      setStep(3);
-    } catch (error) {
-      setErrors({ ...errors, otp: error.message || 'Invalid OTP. Please try again.' });
-    } finally {
-      setLoading(false);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'OTP verification failed');
     }
-  };
+    console.log('OTP verification successful');
+    setStep(3);
+  } catch (error) {
+    setErrors({ ...errors, otp: error.message || 'Invalid OTP. Please try again.' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const PersonalProfile = async () => {
-    setLoading(true);
-    setErrors({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      otp: '',
-      personal: '',
-      username: '',
-      aboutMe: '',
-      dateOfBirth: '',
+  setLoading(true);
+  setErrors({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    otp: '',
+    personal: '',
+    username: '',
+    aboutMe: '',
+    dateOfBirth: '',
+  });
+  const storedEmail = localStorage.getItem('registerEmail') || email;
+  try {
+    const formData = new FormData();
+    formData.append('email', storedEmail);
+    formData.append('username', username);
+    formData.append('about_me', aboutMe);
+    formData.append('date_of_birth', dateOfBirth);
+    if (profilePicture) formData.append('profile_picture', profilePicture);
+
+    console.log('Sending data:', { email: storedEmail, username, aboutMe, dateOfBirth });
+
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+    const response = await fetch(`${API_BASE_URL}/auth/register-step3`, {
+      method: 'POST',
+      body: formData,
     });
-    const storedEmail = localStorage.getItem('registerEmail') || email;
-    try {
-      const formData = new FormData();
-      formData.append('email', storedEmail);
-      formData.append('username', username);
-      formData.append('about_me', aboutMe);
-      formData.append('date_of_birth', dateOfBirth);
-      if (profilePicture) formData.append('profile_picture', profilePicture);
-
-      console.log('Sending data:', { email: storedEmail, username, aboutMe, dateOfBirth });
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch(
-        'https://0b02e4248cf5.ngrok-free.app/auth/register-step3',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-=======
-=======
->>>>>>> Stashed changes
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/register-step3`, {
-        method: 'POST',
-        body: formData,
-      });
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to submit personal information');
-      }
-      console.log('Personal profile submitted successfully:', data);
-      setStep(4);
-    } catch (error) {
-      console.error('Error in PersonalProfile:', error);
-      setErrors({ ...errors, personal: error.message || 'Failed to submit personal information.' });
-    } finally {
-      setLoading(false);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to submit personal information');
     }
-  };
+    console.log('Personal profile submitted successfully:', data);
+    setStep(4);
+  } catch (error) {
+    console.error('Error in PersonalProfile:', error);
+    setErrors({ ...errors, personal: error.message || 'Failed to submit personal information.' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const ResendOtp = async () => {
-    setLoading(true);
-    setErrors({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      otp: '',
-      personal: '',
-      username: '',
-      aboutMe: '',
-      dateOfBirth: '',
-    });
-    const storedEmail = localStorage.getItem('registerEmail') || email;
-    try {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(storedEmail)) {
-        throw new Error('Invalid email in storage');
-      }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch(
-        'https://0b02e4248cf5.ngrok-free.app/auth/resend-otp',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: storedEmail }),
-        }
-      );
-=======
-=======
->>>>>>> Stashed changes
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: storedEmail }),
-      });
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Unable to send new OTP');
-      }
-      console.log('New OTP sent successfully');
-      alert('New OTP sent successfully. Please check your email.');
-    } catch (error) {
-      setErrors({ ...errors, otp: error.message || 'Unable to send new OTP. Please try again.' });
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setErrors({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    otp: '',
+    personal: '',
+    username: '',
+    aboutMe: '',
+    dateOfBirth: '',
+  });
+  const storedEmail = localStorage.getItem('registerEmail') || email;
+  try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(storedEmail)) {
+      throw new Error('Invalid email in storage');
     }
-  };
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+    const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: storedEmail }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Unable to send new OTP');
+    }
+    console.log('New OTP sent successfully');
+    alert('New OTP sent successfully. Please check your email.');
+  } catch (error) {
+    setErrors({ ...errors, otp: error.message || 'Unable to send new OTP. Please try again.' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const completeRegistration = async (interestsToSend = interests) => {
-    setLoading(true);
-    setErrors({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      otp: '',
-      personal: '',
-      username: '',
-      aboutMe: '',
-      dateOfBirth: '',
+  setLoading(true);
+  setErrors({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    otp: '',
+    personal: '',
+    username: '',
+    aboutMe: '',
+    dateOfBirth: '',
+  });
+  const storedEmail = localStorage.getItem('registerEmail') || email;
+  try {
+    console.log('Sending interests:', interestsToSend);
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
+    const response = await fetch(`${API_BASE_URL}/auth/register-step4`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: storedEmail, interests: interestsToSend }),
     });
-    const storedEmail = localStorage.getItem('registerEmail') || email;
-    try {
-      console.log('Sending interests:', interestsToSend);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch(
-        'https://0b02e4248cf5.ngrok-free.app/auth/register-step4',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: storedEmail, interests: interestsToSend }),
-        }
-      );
-=======
-=======
->>>>>>> Stashed changes
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/auth/register-step4`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: storedEmail, interests: interestsToSend }),
-      });
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to generate token');
-      }
-      const token = data.token;
-      localStorage.setItem('authToken', token);
-      console.log('Registration completed, Token stored:', token);
-      localStorage.removeItem('registerEmail');
-      navigate('/Homepost');
-    } catch (error) {
-      console.error('Error in completeRegistration:', error);
-      setErrors({ ...errors, personal: error.message || 'Failed to complete registration.' });
-    } finally {
-      setLoading(false);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to generate token');
     }
-  };
+    const token = data.token;
+    localStorage.setItem('authToken', token);
+    console.log('Registration completed, Token stored:', token);
+    localStorage.removeItem('registerEmail');
+    navigate('/Homepost');
+  } catch (error) {
+    console.error('Error in completeRegistration:', error);
+    setErrors({ ...errors, personal: error.message || 'Failed to complete registration.' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleNextStep = () => {
     setErrors({

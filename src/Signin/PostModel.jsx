@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react';
 
-const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, categories, onPostSubmit, postTitle, setPostTitle, postText, setPostText, postImagePreview, setPostImagePreview, postImageFile, setPostImageFile }) => {
+const PostModal = ({
+  show,
+  onClose,
+  userName,
+  profileImageUrl,
+  loadingImage,
+  categories,
+  onPostSubmit,
+  postTitle,
+  setPostTitle,
+  postText,
+  setPostText,
+  postImagePreview,
+  setPostImagePreview,
+  postImageFile,
+  setPostImageFile,
+}) => {
   const [localPostTitle, setLocalPostTitle] = useState(postTitle || '');
   const [localPostText, setLocalPostText] = useState(postText || '');
   const [localCategory, setLocalCategory] = useState('');
@@ -19,54 +35,58 @@ const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, cat
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('ไฟล์ภาพใหญ่เกินไป (สูงสุด 5MB)');
+        alert('Image file is too large (max 5MB)');
         setLocalPostImageFile(null);
         setLocalPostImagePreview(null);
+        setPostImageFile(null);
+        setPostImagePreview(null);
         return;
       }
       setLocalPostImageFile(file);
+      setPostImageFile(file);
       const fileUrl = URL.createObjectURL(file);
       setLocalPostImagePreview(fileUrl);
-      console.log('Selected file:', file.name, 'Size:', file.size, 'Type:', file.type); // Debug
+      setPostImagePreview(fileUrl);
     } else {
-      alert('กรุณาเลือกไฟล์ที่เป็นภาพ (เช่น .jpg, .png)');
+      alert('Please select an image file (e.g., .jpg, .png)');
       setLocalPostImageFile(null);
       setLocalPostImagePreview(null);
+      setPostImageFile(null);
+      setPostImagePreview(null);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!localPostTitle || !localPostText) {
-      alert('กรุณากรอกหัวข้อและเนื้อหาโพสต์');
+      alert('Please provide a title and content for the post.');
       return;
     }
     if (!localCategory) {
-      alert('กรุณาเลือกหมวดหมู่');
+      alert('Please select a category.');
       return;
     }
 
     const formData = new FormData();
     formData.append('title', localPostTitle);
-    formData.append('text', localPostText);
-    const selectedCat = categories.find((cat) => cat.name.toLowerCase() === localCategory);
+    formData.append('content', localPostText);
+    const selectedCat = categories.find((cat) => cat.name.toLowerCase() === localCategory.toLowerCase());
     if (selectedCat && selectedCat.id !== null) {
       formData.append('categoryId', selectedCat.id);
     } else {
-      alert('หมวดหมู่ไม่ถูกต้องหรือเลือก "All" ซึ่งไม่สามารถใช้ได้');
+      alert('Invalid category selected.');
       return;
     }
-    // if (localPostImageFile) {
-    //   formData.append('images', localPostImageFile);
-    // }
-
-    console.log('FormData contents:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value instanceof File ? value.name : value}`);
+    if (localPostImageFile) {
+      formData.append('images', localPostImageFile);
     }
 
     try {
-      await onPostSubmit(formData, localPostTitle, localPostText, localCategory, localPostImageFile);
+      await onPostSubmit(formData);
+      setPostTitle('');
+      setPostText('');
+      setPostImageFile(null);
+      setPostImagePreview(null);
       setLocalPostTitle('');
       setLocalPostText('');
       setLocalCategory('');
@@ -74,8 +94,7 @@ const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, cat
       setLocalPostImagePreview(null);
       onClose();
     } catch (error) {
-      console.error('Post submission error:', error.message);
-      alert('เกิดข้อผิดพลาดในการโพสต์: ' + error.message);
+      alert(`Failed to create post: ${error.message}`);
     }
   };
 
@@ -101,7 +120,6 @@ const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, cat
                 src={profileImageUrl}
                 alt="Profile"
                 className="w-10 h-10 rounded-full ml-1 mr-1"
-                onError={(e) => console.error('Profile image load error:', e)}
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-2">
@@ -116,7 +134,10 @@ const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, cat
             <input
               type="text"
               value={localPostTitle}
-              onChange={(e) => setLocalPostTitle(e.target.value)}
+              onChange={(e) => {
+                setLocalPostTitle(e.target.value);
+                setPostTitle(e.target.value);
+              }}
               placeholder="Post title"
               className="w-full bg-transparent outline-none text-[#333333] text-base font-semibold poppins-font"
             />
@@ -127,16 +148,18 @@ const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, cat
               className="w-full h-48 p-2 bg-[#F3F3F3] rounded-none border-0 text-base font-normal poppins-font focus:outline-none focus:ring-2 focus:ring-[#C53678]"
               placeholder="Write something..."
               value={localPostText}
-              onChange={(e) => setLocalPostText(e.target.value)}
+              onChange={(e) => {
+                setLocalPostText(e.target.value);
+                setPostText(e.target.value);
+              }}
             />
           </div>
-          {localPostImagePreview && localPostImageFile && (
+          {localPostImagePreview && (
             <div className="px-4 py-4 max-h-[300px] overflow-auto">
               <img
                 src={localPostImagePreview}
                 alt="Post Preview"
                 className="max-w-[200px] h-auto object-contain rounded-lg"
-                onError={(e) => console.error('Post preview image load error:', e)}
               />
             </div>
           )}
@@ -165,9 +188,13 @@ const PostModal = ({ show, onClose, userName, profileImageUrl, loadingImage, cat
             className="px-2 py-2 bg-[#FEF4F4] text-[#333333] rounded-lg poppins-font text-[14px] font-normal w-1/4 pr-8 relative"
           >
             <option value="">Add Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.name.toLowerCase()}>{cat.name}</option>
-            ))}
+            {categories
+              .filter((cat) => cat.id !== null) // Exclude 'All' category
+              .map((cat) => (
+                <option key={cat.id} value={cat.name.toLowerCase()}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
         </div>
         <hr className="border-t-2 border-[#F3F3F3] mx-1 my-4" />

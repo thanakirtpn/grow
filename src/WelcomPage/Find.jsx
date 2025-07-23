@@ -43,110 +43,62 @@ function Find() {
   };
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      setLoadingCategories(true);
-      setErrorCategories(null);
-      try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        const response = await fetch('https://0b02e4248cf5.ngrok-free.app/moment/categories', {
-          headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-        });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-=======
-=======
->>>>>>> Stashed changes
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const resInbox = await fetch(`${API_BASE_URL}/moment/categories`, { headers });
-        if (!resInbox.ok) throw new Error(`HTTP error! Status: ${resInbox.status}`);
-        const data = await resInbox.json();
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-        console.log('Categories API Response:', data);
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    setErrorCategories(null);
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app'; // สอดคล้องกับ Homepost.jsx
+      const response = await fetch(`${API_BASE_URL}/moment/categories`, {
+        headers,
+      });
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      const data = await response.json();
+      console.log('Categories API Response:', data);
 
-        const apiCategories = data.map(category => ({
-          id: category.id,
-          name: category.name,
-          path: `/${category.name.toLowerCase().replace(/\s+/g, '-')}`,
-        }));
+      const apiCategories = data.map((category) => ({
+        id: category.id,
+        name: category.name,
+        path: `/${category.name.toLowerCase().replace(/\s+/g, '-')}`,
+      }));
 
-        const allCategories = [{ id: 'all', name: 'All', path: '/all' }, ...apiCategories];
-        const categoriesWithIcons = allCategories.map(category => ({
-          ...category,
-          icon: getCategoryIcon(category.name),
-        }));
-        console.log('Categories with Icons:', categoriesWithIcons);
+      const allCategories = [{ id: 'all', name: 'All', path: '/all' }, ...apiCategories];
+      const categoriesWithIcons = allCategories.map((category) => ({
+        ...category,
+        icon: getCategoryIcon(category.name),
+      }));
+      console.log('Categories with Icons:', categoriesWithIcons);
 
-        setCategories(categoriesWithIcons);
-      } catch (err) {
-        console.error('Fetch Categories Error:', err);
-        setErrorCategories(err.message || 'Failed to fetch categories');
-        setCategories([
-          { id: 'all', name: 'All', icon: getCategoryIcon('All'), path: '/all' },
-          { id: '1', name: 'Language and Communication', icon: getCategoryIcon('Language and Communication'), path: '/language' },
-          { id: '2', name: 'Music and Arts', icon: getCategoryIcon('Music and Arts'), path: '/music' },
-          { id: '3', name: 'Technology and Innovation', icon: getCategoryIcon('Technology and Innovation'), path: '/technology' },
-          { id: '4', name: 'Cooking and Baking', icon: getCategoryIcon('Cooking and Baking'), path: '/cooking' },
-        ]);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
+      setCategories(categoriesWithIcons);
+    } catch (err) {
+      console.error('Fetch Categories Error:', err);
+      setErrorCategories(err.message || 'Failed to fetch categories');
+      setCategories([
+        { id: 'all', name: 'All', icon: getCategoryIcon('All'), path: '/all' },
+        { id: '1', name: 'Language and Communication', icon: getCategoryIcon('Language and Communication'), path: '/language' },
+        { id: '2', name: 'Music and Arts', icon: getCategoryIcon('Music and Arts'), path: '/music' },
+        { id: '3', name: 'Technology and Innovation', icon: getCategoryIcon('Technology and Innovation'), path: '/technology' },
+        { id: '4', name: 'Cooking and Baking', icon: getCategoryIcon('Cooking and Baking'), path: '/cooking' },
+      ]);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
-    fetchCategories();
-  }, []);
+  fetchCategories();
+}, []);
 
   useEffect(() => {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    const fetchPosts = async () => {
-      setLoadingPosts(true);
-      setErrorPosts(null);
-      try {
-        let url = 'https://0b02e4248cf5.ngrok-free.app/moment';
-        if (selectedCategoryId !== null) {
-          url += `?categoryId=${selectedCategoryId}`;
-        }
-        const response = await fetch(url, {
-          headers: { 
-            'Accept': 'application/json',
-            'ngrok-skip-browser-warning': 'true' 
-          },
-        });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-        console.log('Posts API Response:', data);
-        setPosts(data);
-      } catch (err) {
-        console.error('Fetch Posts Error:', err);
-        setErrorPosts(err.message || 'Failed to fetch posts');
-        setPosts([]);
-      } finally {
-        setLoadingPosts(false);
-=======
-=======
->>>>>>> Stashed changes
   const fetchPosts = async () => {
     setLoadingPosts(true);
     setErrorPosts(null);
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
       let url = `${API_BASE_URL}/moment`;
       if (selectedCategoryId && selectedCategoryId !== 'all') {
         url += `?categoryId=${selectedCategoryId}`;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
       }
       const response = await fetch(url, {
-        headers: { 
-          'Accept': 'application/json',
-          'ngrok-skip-browser-warning': 'true' 
-        },
+        headers,
       });
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
@@ -163,6 +115,7 @@ function Find() {
 
   fetchPosts();
 }, [selectedCategoryId]);
+
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategoryId(categoryId);
@@ -202,7 +155,7 @@ function Find() {
 
   return (
     <nav className="bg-white p-4 sm:p-6 md:p-8">
-      {/* <div className="container mx-auto flex justify-between items-center">
+      <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center text-black font-bold text-3xl sm:text-4xl md:text-5xl hover:text-gray-900" aria-label="Go to homepage">
           <img src={myImageG} alt="GlowTogether Logo" className="h-5 sm:h-10 md:h-12 object-contain" />
         </Link>
@@ -250,7 +203,7 @@ function Find() {
             Join Now
           </Link>
         </div>
-      </div> */}
+      </div>
       {showCategories && (
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg mx-auto max-w-screen-lg">
           {loadingCategories && <p className="text-center text-gray-700">Loading categories...</p>}

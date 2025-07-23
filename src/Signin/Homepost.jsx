@@ -6,15 +6,8 @@ import myImageS from '../assets/Setup.png';
 import myImageL from '../assets/Left2.png';
 import myImageR from '../assets/Right.png';
 import Post from './Post';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+import PostModal from './PostModel';
 import Header from '../components/header';
-=======
-import PostModal from './PostModel';
->>>>>>> Stashed changes
-=======
-import PostModal from './PostModel';
->>>>>>> Stashed changes
 
 const Homepost = () => {
   const [posts, setPosts] = useState([]);
@@ -38,21 +31,20 @@ const Homepost = () => {
   const [postImageFile, setPostImageFile] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [userName, setUserName] = useState('User');
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');
-    console.log('Auth Token:', token);
     if (!token) {
-      console.warn('No auth token found');
       return {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'ngrok-skip-browser-warning': 'true',
       };
     }
     return {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     };
   };
 
@@ -73,50 +65,32 @@ const Homepost = () => {
     return emojis[categoryName] || '🏷️';
   };
 
+  const normalizeImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
       setErrorCategories(null);
       try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        const response = await fetch('https://0b02e4248cf5.ngrok-free.app/moment/categories', {
-          headers: { Accept: 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        const response = await fetch(`${API_BASE_URL}/moment/categories`, {
+          headers: getAuthHeaders(),
         });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-=======
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://0b02e4248cf5.ngrok-free.app';
-        const response = await fetch(`${API_BASE_URL}/moment/categories`, { headers: getAuthHeaders() });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
->>>>>>> Stashed changes
-=======
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://0b02e4248cf5.ngrok-free.app';
-        const response = await fetch(`${API_BASE_URL}/moment/categories`, { headers: getAuthHeaders() });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
->>>>>>> Stashed changes
+        if (!response.ok) throw new Error(`Failed to fetch categories: ${response.status}`);
         const data = await response.json();
-        console.log('Categories API Response:', JSON.stringify(data, null, 2));
         const apiCategories = data.map((category) => ({
           id: category.id,
           name: category.name,
           path: `/${category.name.toLowerCase().replace(/\s+/g, '-')}`,
-        }));
-        const allCategories = [{ id: null, name: 'All', path: '/all' }, ...apiCategories];
-        const categoriesWithIcons = allCategories.map((category) => ({
-          ...category,
           icon: getCategoryIcon(category.name),
         }));
-        setCategories(categoriesWithIcons);
+        setCategories([{ id: null, name: 'All', path: '/all', icon: getCategoryIcon('All') }, ...apiCategories]);
       } catch (err) {
-        console.error('Fetch Categories Error:', err.message);
         setErrorCategories(err.message || 'Failed to fetch categories');
-        setCategories([
-          { id: null, name: 'All', icon: getCategoryIcon('All'), path: '/all' },
-          { id: 1, name: 'Language and Communication', icon: getCategoryIcon('Language and Communication'), path: '/language' },
-          { id: 2, name: 'Music and Arts', icon: getCategoryIcon('Music and Arts'), path: '/music' },
-          { id: 3, name: 'Technology and Innovation', icon: getCategoryIcon('Technology and Innovation'), path: '/technology' },
-          { id: 4, name: 'Cooking and Baking', icon: getCategoryIcon('Cooking and Baking'), path: '/cooking' },
-        ]);
+        setCategories([]); // Avoid hardcoded fallback to prevent ID mismatches
       } finally {
         setLoadingCategories(false);
       }
@@ -126,179 +100,99 @@ const Homepost = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      if (!categories.length && selectedCategoryId !== null) return; // Wait for categories if filtering
       setLoadingPosts(true);
       setErrorPosts(null);
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.warn('No auth token found, skipping posts fetch');
-        setErrorPosts('ไม่มีโทเคนการยืนยันตัวตน');
-        setPosts([]);
+        setErrorPosts('Please log in to view posts');
         setLoadingPosts(false);
         return;
       }
       try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        let url = 'https://0b02e4248cf5.ngrok-free.app/api/posts';
-=======
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
         let url = `${API_BASE_URL}/api/posts`;
->>>>>>> Stashed changes
-=======
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
-        let url = `${API_BASE_URL}/api/posts`;
->>>>>>> Stashed changes
         if (selectedCategoryId !== null) {
           url += `?categoryId=${selectedCategoryId}`;
         }
         const response = await fetch(url, { headers: getAuthHeaders() });
         if (!response.ok) {
           if (response.status === 401) {
-            console.error('Unauthorized: Invalid or expired token');
-            alert('กรุณาล็อกอินใหม่');
+            alert('Session expired. Please log in again.');
             localStorage.removeItem('authToken');
             window.location.href = '/login';
             return;
           }
-          throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+          throw new Error(`Failed to fetch posts: ${response.status}`);
         }
         const data = await response.json();
-        console.log('Posts API Response:', JSON.stringify(data, null, 2)); // Debug
-        // แปลง image_url ให้เป็น full URL
         const formattedPosts = data.map((post) => ({
           ...post,
-          image_url: post.image_url
-            ? post.image_url.startsWith('http')
-              ? post.image_url
-              : `${API_BASE_URL}${post.image_url.startsWith('/') ? '' : '/'}${post.image_url}`
-            : null,
+          category: categories.find((cat) => cat.id === post.category_id) || { name: 'Uncategorized' },
+          image_url: post.image_url ? normalizeImageUrl(post.image_url) : null,
         }));
         setPosts(formattedPosts);
       } catch (err) {
-        console.error('Fetch Posts Error:', err.message);
-        setErrorPosts(err.message || 'ไม่สามารถดึงโพสต์ได้');
+        setErrorPosts(err.message || 'Failed to fetch posts');
         setPosts([]);
       } finally {
         setLoadingPosts(false);
       }
     };
     fetchPosts();
-  }, [selectedCategoryId]);
+  }, [selectedCategoryId, categories.length]);
 
- useEffect(() => {
-  const fetchProfileImage = async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      console.warn('No auth token found, skipping profile fetch');
-      setProfileImageUrl(null);
-      setUserName('User');
-      setLoadingImage(false);
-      return;
-    }
-    setLoadingImage(true);
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-      'ngrok-skip-browser-warning': 'true',
-    };
-    try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const profileResponse = await fetch(`${API_BASE_URL}/api/profile/me`, { headers });
-      if (!profileResponse.ok) {
-        throw new Error(`HTTP error! Status: ${profileResponse.status}`);
-      }
-      const profileData = await profileResponse.json();
-      console.log('Profile Data:', profileData);
-
-      const name = profileData.name || profileData.username || profileData.display_name || 'User';
-      setUserName(name);
-
-      let profileImageUrl = null;
-      if (profileData.profileImage) {
-        profileImageUrl = `${API_BASE_URL}${profileData.profileImage.startsWith('/') ? '' : '/'}${profileData.profileImage}`;
-      } else if (profileData.profile_picture) {
-        profileImageUrl = `${API_BASE_URL}${profileData.profile_picture.startsWith('/') ? '' : '/'}${profileData.profile_picture}`;
-      } else if (profileData.profilePicture) {
-        profileImageUrl = `${API_BASE_URL}${profileData.profilePicture.startsWith('/') ? '' : '/'}${profileData.profilePicture}`;
-      } else {
-        console.log('No profile image found in profileData, using default');
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
         setProfileImageUrl(null);
+        setUserName('User');
+        setLoadingImage(false);
         return;
       }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
       setLoadingImage(true);
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      };
       try {
-        const profileResponse = await fetch('https://0b02e4248cf5.ngrok-free.app/api/profile/me', { headers });
-        if (!profileResponse.ok) {
-          throw new Error(`HTTP error! Status: ${profileResponse.status}`);
-        }
-        const profileData = await profileResponse.json();
-        console.log('Profile Data:', profileData);
-
+        const response = await fetch(`${API_BASE_URL}/api/profile/me`, {
+          headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error(`Failed to fetch profile: ${response.status}`);
+        const profileData = await response.json();
         const name = profileData.name || profileData.username || profileData.display_name || 'User';
         setUserName(name);
 
-        let profileImage = null;
-        const storedProfileUrl = localStorage.getItem('profilePictureUrl');
-        if (storedProfileUrl) {
-          profileImage = storedProfileUrl;
-        } else if (profileData.profileImage) {
-          profileImage = `https://0b02e4248cf5.ngrok-free.app${profileData.profileImage.startsWith('/') ? '' : '/'}${profileData.profileImage}`;
-        } else if (profileData.profile_picture) {
-          profileImage = `https://0b02e4248cf5.ngrok-free.app${profileData.profile_picture.startsWith('/') ? '' : '/'}${profileData.profile_picture}`;
-        } else if (posts.length > 0 && posts[0]?.user?.profile_picture) {
-          profileImage = `https://0b02e4248cf5.ngrok-free.app${posts[0].user.profile_picture.startsWith('/') ? '' : '/'}${posts[0].user.profile_picture}`;
-=======
-
-=======
-
->>>>>>> Stashed changes
-      if (profileImageUrl) {
-        const imageResponse = await fetch(profileImageUrl, { headers });
-        if (!imageResponse.ok) {
-          console.error(`Image fetch error: Status ${imageResponse.status}, URL: ${profileImageUrl}`);
-          throw new Error(`Image fetch failed with status ${imageResponse.status}`);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+        const imageField = profileData.profileImage || profileData.profile_picture || profileData.profilePicture;
+        if (imageField) {
+          const imageUrl = normalizeImageUrl(imageField);
+          const imageResponse = await fetch(imageUrl, { headers: getAuthHeaders() });
+          if (!imageResponse.ok) throw new Error(`Failed to fetch profile image: ${imageResponse.status}`);
+          const imageBlob = await imageResponse.blob();
+          const imageObjectUrl = URL.createObjectURL(imageBlob);
+          setProfileImageUrl(imageObjectUrl);
+          localStorage.setItem('profilePictureUrl', imageObjectUrl);
+        } else {
+          setProfileImageUrl(null);
         }
-        const imageBlob = await imageResponse.blob();
-        const imageObjectUrl = URL.createObjectURL(imageBlob);
-        setProfileImageUrl(imageObjectUrl);
-        localStorage.setItem('profilePictureUrl', imageObjectUrl);
-      } else {
-        console.warn('No valid profile image URL found');
+      } catch (error) {
         setProfileImageUrl(null);
+        setUserName('User');
+      } finally {
+        setLoadingImage(false);
       }
-    } catch (error) {
-      console.error('Error fetching profile:', error.message);
-      setProfileImageUrl(null);
-      setUserName('User');
-    } finally {
-      setLoadingImage(false);
-    }
-  };
-  fetchProfileImage();
+    };
+    fetchProfileImage();
 
-  return () => {
-    if (profileImageUrl && profileImageUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(profileImageUrl);
-    }
-  };
-}, [posts]);
+    return () => {
+      if (profileImageUrl && profileImageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(profileImageUrl);
+      }
+    };
+  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('ไฟล์ภาพใหญ่เกินไป (สูงสุด 5MB)');
+        alert('Image file is too large (max 5MB)');
         setPostImageFile(null);
         setPostImagePreview(null);
         return;
@@ -307,137 +201,77 @@ const Homepost = () => {
       const fileUrl = URL.createObjectURL(file);
       setPostImagePreview(fileUrl);
     } else {
-      alert('กรุณาเลือกไฟล์ที่เป็นภาพ (เช่น .jpg, .png)');
+      alert('Please select an image file (e.g., .jpg, .png)');
       setPostImageFile(null);
       setPostImagePreview(null);
     }
   };
 
-  const handlePostSubmit = async (formData, submittedTitle, submittedText, submittedCategory, submittedImageFile) => {
+  const handlePostSubmit = async (formData) => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      console.warn('No auth token found, cannot submit post');
-      alert('กรุณาล็อกอินเพื่อสร้างโพสต์!');
+      alert('Please log in to create a post!');
       return;
     }
 
     try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      const response = await fetch('https://0b02e4248cf5.ngrok-free.app/api/posts', {
-=======
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
-      console.log('Posting to:', `${API_BASE_URL}/api/posts`);
       const response = await fetch(`${API_BASE_URL}/api/posts`, {
->>>>>>> Stashed changes
-=======
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://efad2ca833e0.ngrok-free.app';
-      console.log('Posting to:', `${API_BASE_URL}/api/posts`);
-      const response = await fetch(`${API_BASE_URL}/api/posts`, {
->>>>>>> Stashed changes
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'ngrok-skip-browser-warning': 'true',
         },
         body: formData,
       });
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      if (response.ok) {
-        const newPost = await response.json();
-        setPosts([
-          {
-            id: newPost.id,
-            title: newPost.title,
-            text: newPost.text,
-            category: selectedCat?.name || category,
-            image_url: newPost.image_url
-              ? `https://0b02e4248cf5.ngrok-free.app${newPost.image_url.startsWith('/') ? '' : '/'}${newPost.image_url}`
-              : null,
-            user: { name: userName, profile_picture: profileImageUrl },
-          },
-          ...posts,
-        ]);
-        setPostTitle('');
-        setPostText('');
-        setCategory('');
-        setPostImageFile(null);
-        setPostImagePreview(null);
-        setShowPostModal(false);
-        alert('โพสต์สำเร็จ!');
-      } else {
-        const errorData = await response.json();
-        console.error('Post creation failed:', JSON.stringify(errorData, null, 2));
-        alert(`ไม่สามารถสร้างโพสต์ได้: ${errorData.message || 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์'}`);
-=======
-=======
->>>>>>> Stashed changes
-      console.log('Post Response Status:', response.status, response.statusText);
       if (!response.ok) {
-        let errorMessage = `HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          console.error('Post creation error details:', JSON.stringify(errorData, null, 2));
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          console.error('Failed to parse error response:', e);
-        }
-        throw new Error(errorMessage);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to create post: ${response.status}`);
       }
 
       const newPost = await response.json();
-      console.log('New Post Response:', JSON.stringify(newPost, null, 2));
-
       const newPostForState = {
         id: newPost.id,
-        title: newPost.text || submittedTitle,
-        text: newPost.text || submittedText,
-        category: categories.find((cat) => cat.id === newPost.categoryId) || { name: submittedCategory },
-        images: newPost.images
-          ? newPost.images.startsWith('http')
-            ? newPost.images
-            : `${API_BASE_URL}${newPost.images.startsWith('/') ? '' : '/'}${newPost.images}`
-          : null,
-        user: {
-          name: userName,
-          profile_picture: profileImageUrl,
-        },
+        title: newPost.title,
+        content: newPost.content,
+        category: categories.find((cat) => cat.id === newPost.categoryId) || { name: 'Uncategorized' },
+        image_url: newPost.images?.[0]?.image_url ? normalizeImageUrl(newPost.images[0].image_url) : null,
+        user: { username: userName, profile_picture: profileImageUrl },
+        created_at: new Date().toISOString(),
       };
-
-      setPosts([newPostForState, ...posts]);
-      alert('โพสต์สำเร็จ!');
+      setPosts((prevPosts) => [newPostForState, ...prevPosts]);
+      alert('Post created successfully!');
+      setShowPostModal(false);
+      setPostTitle('');
+      setPostText('');
+      setPostImageFile(null);
+      setPostImagePreview(null);
     } catch (error) {
-      console.error('Error posting:', error.message);
-      throw error;
+      alert(`Failed to create post: ${error.message}`);
     }
   };
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategoryId(categoryId);
+    const selectedCat = categories.find((cat) => cat.id === categoryId);
+    setCategory(selectedCat ? selectedCat.name : '');
   };
 
   const handleFindClick = () => {
-    console.log('Find clicked');
+    // Implement find functionality
   };
 
   const handleMomentClick = () => {
-    console.log('Moment clicked, showCategories:', !showCategories);
     setShowCategories(!showCategories);
     setIsMomentActive(!showCategories);
   };
 
   const handleTalkClick = () => {
-    console.log('Talk clicked');
+    // Implement talk functionality
   };
 
   const handleProfileClick = () => {
-    console.log('Profile clicked');
+    // Implement profile functionality
   };
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -461,17 +295,16 @@ const Homepost = () => {
     setTouchStart(null);
   };
 
-  // JSX เดิมจากโค้ดชุดที่สอง (รวม PostModal)
   return (
     <div className="bg-white min-h-screen">
-      {/* <nav className="bg-white p-4 sm:p-6 md:p-8">
+      <nav className="bg-white p-4 sm:p-6 md:p-8">
         <div className="container mx-auto flex justify-between items-center">
           <Link
             to="/"
             className="flex items-center text-black font-bold text-3xl sm:text-4xl md:text-5xl hover:text-gray-900"
             aria-label="Go to homepage"
           >
-            <img src={myImageG} alt="GlowTogather Logo" className="h-5 sm:h-10 md:h-12 object-contain" onError={(e) => console.error('Logo load error:', e)} />
+            <img src={myImageG} alt="GlowTogather Logo" className="h-5 sm:h-10 md:h-12 object-contain" />
           </Link>
           <ul className="hidden sm:flex text-[#333333] text-base sm:text-base md:text-base px-4 py-2 rounded-lg font-normal poppins-font gap-6 pl-60">
             <li>
@@ -541,18 +374,17 @@ const Homepost = () => {
               </div>
               <div className="flex gap-4">
                 <Link to="/" className="flex text-3xl sm:text-4xl md:text-5xl hover:text-gray-900" aria-label="Warn">
-                  <img src={myImageW} alt="Warn Icon" className="h-9 sm:h-9 md:h-9 object-contain" onError={(e) => console.error('Warn icon load error:', e)} />
+                  <img src={myImageW} alt="Warn Icon" className="h-9 sm:h-9 md:h-9 object-contain" />
                 </Link>
                 <Link to="/" className="flex text-3xl sm:text-4xl md:text-5xl hover:text-gray-900" aria-label="Setup">
-                  <img src={myImageS} alt="Setup Icon" className="h-9 sm:h-9 md:h-9 object-contain" onError={(e) => console.error('Setup icon load error:', e)} />
+                  <img src={myImageS} alt="Setup Icon" className="h-9 sm:h-9 md:h-9 object-contain" />
                 </Link>
               </div>
             </div>
           </div>
         </div>
-      </nav> */}
+      </nav>
       <Header />
-
       {showCategories && (
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg mx-auto max-w-screen-lg">
           {loadingCategories && <p className="text-center text-gray-700">Loading categories...</p>}
@@ -572,10 +404,7 @@ const Homepost = () => {
                           src={profileImageUrl}
                           alt="Profile"
                           className="w-12 h-12 rounded-full"
-                          onError={(e) => {
-                            console.error('Profile image load error:', e);
-                            setProfileImageUrl(myImageG);
-                          }}
+                          onError={() => setProfileImageUrl(null)}
                         />
                       ) : (
                         <div className="w-10 h-10 bg-[#F3F3F3] rounded-full flex items-center justify-center">
@@ -630,7 +459,7 @@ const Homepost = () => {
                   className="p-2 sm:p-3 rounded-full border-none bg-transparent outline-none no-style hover:underline"
                   aria-label="Scroll left"
                 >
-                  <img src={myImageL} alt="Scroll Left" className="w-20 sm:w-36 h-5 sm:h-12" onError={(e) => console.error('Scroll left icon load error:', e)} />
+                  <img src={myImageL} alt="Scroll Left" className="w-20 sm:w-36 h-5 sm:h-12" />
                 </button>
                 <div
                   ref={scrollRef}
@@ -667,7 +496,7 @@ const Homepost = () => {
                   className="p-2 sm:p-3 rounded-full hover:bg-gray-100 border-none bg-transparent outline-none no-style hover:underline"
                   aria-label="Scroll right"
                 >
-                  <img src={myImageR} alt="Scroll Right" className="w-20 sm:w-36 h-5 sm:h-12" onError={(e) => console.error('Scroll right icon load error:', e)} />
+                  <img src={myImageR} alt="Scroll Right" className="w-20 sm:w-36 h-5 sm:h-12" />
                 </button>
               </div>
               <section className="container mx-auto p-1 sm:p-2 md:p-4 mt-0 sm:mt-0">
@@ -676,7 +505,12 @@ const Homepost = () => {
                 {!loadingPosts && !errorPosts && posts.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
                     {posts.map((post) => (
-                      <Post key={post.id} post={post} />
+                      <Post
+                        key={post.id}
+                        post={post}
+                        categories={categories}
+                        onPostCreated={(newPost) => setPosts((prevPosts) => [newPost, ...prevPosts])}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -692,6 +526,9 @@ const Homepost = () => {
                 setShowPostModal(false);
                 setPostImageFile(null);
                 setPostImagePreview(null);
+                setPostTitle('');
+                setPostText('');
+                setCategory('');
               }}
               userName={userName}
               profileImageUrl={profileImageUrl}

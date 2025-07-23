@@ -9,55 +9,54 @@ function Post({ post }) {
   const [profileError, setProfileError] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [profileSrc, setProfileSrc] = useState(null);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return token
+      ? {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        }
+      : {
+          Accept: 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        };
+  };
+
+  const normalizeImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  };
 
   const fetchImage = async (url) => {
-    const token = localStorage.getItem('authToken');
+    if (!url || url.startsWith('blob:')) return null; // ป้องกันการ fetch blob URL
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const fullUrl = `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
-      const response = await fetch(fullUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'ngrok-skip-browser-warning': 'true',
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch image');
+      const response = await fetch(url, { headers: getAuthHeaders() });
+      if (!response.ok) throw new Error(`Failed to fetch image: ${response.status}`);
       const blob = await response.blob();
       return URL.createObjectURL(blob);
     } catch (error) {
-      console.error('Image fetch error:', error);
       return null;
     }
   };
 
   useEffect(() => {
     const loadImages = async () => {
+      // โหลดรูปภาพโพสต์
       if (post.images?.length > 0 && post.images[0]?.image_url && !imageError) {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        const url = `https://0b02e4248cf5.ngrok-free.app${post.images[0].image_url.startsWith('/') ? '' : '/'}${post.images[0].image_url}`;
-=======
-        const url = post.images[0].image_url;
->>>>>>> Stashed changes
-=======
-        const url = post.images[0].image_url;
->>>>>>> Stashed changes
+        const url = normalizeImageUrl(post.images[0].image_url);
         const src = await fetchImage(url);
         setImageSrc(src || defaultImage);
       } else {
         setImageSrc(defaultImage);
       }
 
+      // โหลดรูปโปรไฟล์
       if (post.user?.profile_picture && !profileError) {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        const url = `https://0b02e4248cf5.ngrok-free.app${post.user.profile_picture.startsWith('/') ? '' : '/'}${post.user.profile_picture}`;
-=======
-        const url = post.user.profile_picture;
->>>>>>> Stashed changes
-=======
-        const url = post.user.profile_picture;
->>>>>>> Stashed changes
+        const url = normalizeImageUrl(post.user.profile_picture);
         const src = await fetchImage(url);
         setProfileSrc(src || defaultProfile);
       } else {
