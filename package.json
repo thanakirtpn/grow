@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dbuild":"docker rmi grow-app -f && docker build -t grow-app ."
   },
   "dependencies": {
     "@fontsource/poppins": "^5.2.6",
@@ -20,20 +21,20 @@
     "react-icons": "^5.5.0",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^7.6.2",
-    "swiper": "^11.2.8"
+    "swiper": "^11.2.8",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10",
+    "vite": "^6.3.5",
+    "@vitejs/plugin-react-swc": "^3.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react-swc": "^3.9.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "postcss": "^8.5.5",
-    "tailwindcss": "^4.1.10",
-    "vite": "^6.3.5"
+    "globals": "^16.0.0"
   }
 }
